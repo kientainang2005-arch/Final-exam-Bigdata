@@ -1,0 +1,197 @@
+{
+ "polars-eager": {
+  "rows_a": 1681405,
+  "rows_b": 1681405,
+  "y": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npl_ln": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "nim_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "texas": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "cre_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "brokered_dep": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "g4_asset": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_vol8": {
+   "null_mismatch": 0,
+   "max_abs_diff": 4.00096466894595e-09
+  },
+  "roa_4q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 1.1102230246251565e-16
+  },
+  "state_npa_med": {
+   "null_mismatch": 0,
+   "max_abs_diff": 2.7755575615628914e-17
+  },
+  "max_abs_diff_all": 4.00096466894595e-09
+ },
+ "polars-lazy": {
+  "rows_a": 1681405,
+  "rows_b": 1681405,
+  "y": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npl_ln": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "nim_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "texas": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "cre_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "brokered_dep": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "g4_asset": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_vol8": {
+   "null_mismatch": 0,
+   "max_abs_diff": 4.00096466894595e-09
+  },
+  "roa_4q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 1.1102230246251565e-16
+  },
+  "state_npa_med": {
+   "null_mismatch": 0,
+   "max_abs_diff": 2.7755575615628914e-17
+  },
+  "max_abs_diff_all": 4.00096466894595e-09
+ },
+ "polars-streaming": {
+  "rows_a": 1681405,
+  "rows_b": 1681405,
+  "y": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "npl_ln": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "nim_q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "texas": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "cre_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "brokered_dep": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_eq_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "d4_npa_ta": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "g4_asset": {
+   "null_mismatch": 0,
+   "max_abs_diff": 0.0
+  },
+  "roa_vol8": {
+   "null_mismatch": 0,
+   "max_abs_diff": 4.00096466894595e-09
+  },
+  "roa_4q": {
+   "null_mismatch": 0,
+   "max_abs_diff": 1.1102230246251565e-16
+  },
+  "state_npa_med": {
+   "null_mismatch": 0,
+   "max_abs_diff": 2.7755575615628914e-17
+  },
+  "max_abs_diff_all": 4.00096466894595e-09
+ }
+}

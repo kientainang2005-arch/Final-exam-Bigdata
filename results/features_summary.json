@@ -1,0 +1,25 @@
+{
+ "rows": 1681405,
+ "n_features": 40,
+ "seconds": 3.2,
+ "pit_test": [
+  {
+   "cutoff": "1991-12-31",
+   "rows_compared": 540983,
+   "features": 40,
+   "max_abs_diff": 0.0
+  },
+  {
+   "cutoff": "2009-06-30",
+   "rows_compared": 1279056,
+   "features": 40,
+   "max_abs_diff": 0.0
+  },
+  {
+   "cutoff": "2023-03-31",
+   "rows_compared": 1622389,
+   "features": 40,
+   "max_abs_diff": 0.0
+  }
+ ]
+}

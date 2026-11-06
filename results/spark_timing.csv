@@ -1,0 +1,3 @@
+engine,seconds
+spark local[*],104.76818160000016
+polars lazy,2.1451002000001154

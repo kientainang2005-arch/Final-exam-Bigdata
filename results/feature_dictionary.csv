@@ -1,0 +1,41 @@
+feature,group,rationale,missing_pct,median_failing (y=1),median_others (y=0)
+eq_ta,C,equity cushion against losses,0.2500,0.0167,0.0925
+npl_ln,A,non-current loans share,1.2700,0.0985,0.0092
+npa_ta,A,non-performing assets incl. repossessed RE,0.1500,0.1071,0.0072
+pd30_ta,A,"early delinquency, leads NPLs",58.3400,0.0235,0.0041
+ore_ta,A,foreclosed real estate,0.2800,0.0305,0.0005
+texas,A,Texas ratio: bad assets / loss-absorbing capital,0.3800,1.6658,0.0688
+alll_ln,A,loan-loss reserve level,1.3700,0.0306,0.0126
+nco_ln,A,annualised net charge-offs,6.1200,0.0190,0.0005
+prov_ta,A,annualised provisions,2.8900,0.0105,0.0011
+efficiency,M,cost / income,1.7300,1.2058,0.6683
+roa_q,E,annualised quarterly ROA (de-cumulated),0.5900,-0.0291,0.0096
+nim_q,E,annualised net interest margin,0.6600,0.0222,0.0371
+div_payer,E,pays dividends this quarter,0.0000,0.0000,0.0000
+liq_ta,L,liquid assets,0.0100,0.1916,0.3057
+loans_ta,L,loan-to-assets,0.0000,0.6797,0.6132
+coredep_ta,L,stable funding,0.0800,0.8088,0.7736
+brokered_dep,L,hot money,1.7100,0.0000,0.0000
+volliab_ta,L,volatile liabilities,0.2500,0.1626,0.0978
+fhlb_ta,L,wholesale borrowings,49.6700,0.0599,0.0092
+cof_ta,S,cost of funds (rate sensitivity),0.6600,0.0613,0.0309
+cre_ta,S,commercial RE concentration,0.2200,0.1720,0.1068
+constr_ta,S,construction & land development,0.1800,0.0298,0.0135
+resid_ln,S,1-4 family mortgages,1.3000,0.2558,0.2720
+ci_ln,S,C&I loans,1.1200,0.1157,0.1268
+cons_ln,S,consumer loans,1.3500,0.0718,0.0903
+ag_ln,S,agricultural loans,12.6600,0.0000,0.0141
+log_assets,size,"size (too-big-to-fail, diversification)",0.0000,11.2301,11.3500
+d4_eq_ta,dyn,change over 4 quarters (deterioration speed),5.9300,-0.0309,0.0007
+d4_npa_ta,dyn,change over 4 quarters (deterioration speed),5.8500,0.0286,-0.0001
+d4_npl_ln,dyn,change over 4 quarters (deterioration speed),6.9100,0.0250,-0.0001
+d4_roa_q,dyn,change over 4 quarters (deterioration speed),6.2600,-0.0150,0.0001
+g4_asset,dyn,4-quarter growth (rapid growth precedes failures),5.7000,-0.0827,0.0526
+g4_lnlsgr,dyn,4-quarter growth (rapid growth precedes failures),6.7200,-0.1106,0.0630
+roa_vol8,dyn,"earnings volatility, trailing 8 quarters",4.8600,0.0384,0.0039
+roa_4q,dyn,trailing 4-quarter mean ROA,2.0300,-0.0346,0.0095
+n_reports,dyn,length of reporting history (de novo risk),0.0000,21.0000,46.0000
+state_npa_med,ctx,"state-level stress, same quarter",0.0000,0.0228,0.0071
+state_roa_med,ctx,"state-level stress, same quarter",0.0100,0.0059,0.0098
+npa_vs_state,ctx,bank NPA relative to state median,0.1500,0.0815,-0.0000
+fails_trailing4q_us,ctx,US failures in the past 4 quarters (public),0.0000,201.0000,25.0000

@@ -1,0 +1,7 @@
+{
+ "failed_banks_in_test": 545,
+ "flagged_at_least_once": 526,
+ "median_lead_quarters": 4.0,
+ "alarms_total": 9584,
+ "bank_quarters": 435446
+}

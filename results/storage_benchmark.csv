@@ -1,0 +1,7 @@
+layout,size_MB,write_s,read_all_s,read_5cols_s,filter_2008_2010_s,size_vs_csv
+CSV (uncompressed),518.879,0.593,7.537,6.749,6.138,1.000
+CSV + gzip,213.625,40.087,5.559,2.304,2.420,0.412
+Parquet snappy (1 file),241.680,0.380,0.110,0.010,0.011,0.466
+Parquet zstd-3 (1 file),195.050,0.615,0.142,0.014,0.012,0.376
+"Parquet zstd-3, partitioned by year",207.608,0.889,0.187,0.028,0.013,0.400
+CSV read with pandas (baseline),518.879,,5.477,1.363,,1.000

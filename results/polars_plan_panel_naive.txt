@@ -1,0 +1,36 @@
+ WITH_COLUMNS:
+ [when(col("FAILDATE").is_not_null()).then("failure").otherwise(when(col("qi").max().over([col("CERT")]) < col("qi").max()).then("other exit (merger/closure)").otherwise("active")).alias("exit_type"), (col("qi").max().over([col("CERT")]) == col("qi")).alias("is_last_report")] 
+   WITH_COLUMNS:
+   [(((col("fail_qi") > col("qi")) & (col("fail_qi") <= (col("qi") + 4)))).fill_null([false]).strict_cast(Int8).alias("y"), (col("fail_qi") - col("qi")).alias("q_to_fail")] 
+    FILTER (col("FAILDATE").is_null() | (col("REPDTE") < col("FAILDATE")))
+    FROM
+      LEFT JOIN:
+      LEFT PLAN ON: [col("CERT")]
+         WITH_COLUMNS:
+         [when(col("REPDTE").dt.month() == 3).then(col("NETINC")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("NETINC") - col("NETINC").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("NETINC_Q"), when(col("REPDTE").dt.month() == 3).then(col("INTINC")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("INTINC") - col("INTINC").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("INTINC_Q"), when(col("REPDTE").dt.month() == 3).then(col("EINTEXP")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("EINTEXP") - col("EINTEXP").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("EINTEXP_Q"), when(col("REPDTE").dt.month() == 3).then(col("NONII")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("NONII") - col("NONII").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("NONII_Q"), when(col("REPDTE").dt.month() == 3).then(col("NONIX")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("NONIX") - col("NONIX").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("NONIX_Q"), when(col("REPDTE").dt.month() == 3).then(col("ELNATR")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("ELNATR") - col("ELNATR").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("ELNATR_Q"), when(col("REPDTE").dt.month() == 3).then(col("NTLNLS")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("NTLNLS") - col("NTLNLS").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("NTLNLS_Q"), when(col("REPDTE").dt.month() == 3).then(col("EQCDIV")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == (col("qi") - 1)).then(col("EQCDIV") - col("EQCDIV").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("EQCDIV_Q")] 
+          SORT BY [col("CERT"), col("qi")]
+             WITH_COLUMNS:
+             [((col("REPDTE").dt.year() * 4) + ((col("REPDTE").dt.month().cast(Int32) - 1) // 3)).alias("qi")] 
+               WITH_COLUMNS:
+               [when(col("ASSET") < 0).then(null.cast(Int64)).otherwise(col("ASSET")).alias("ASSET"), when(col("DEP") < 0).then(null.cast(Int64)).otherwise(col("DEP")).alias("DEP"), when(col("DEPDOM") < 0).then(null.cast(Int64)).otherwise(col("DEPDOM")).alias("DEPDOM"), when(col("CHBAL") < 0).then(null.cast(Int64)).otherwise(col("CHBAL")).alias("CHBAL"), when(col("SC") < 0).then(null.cast(Int64)).otherwise(col("SC")).alias("SC"), when(col("LNLSGR") < 0).then(null.cast(Int64)).otherwise(col("LNLSGR")).alias("LNLSGR"), when(col("LNLSNET") < 0).then(null.cast(Int64)).otherwise(col("LNLSNET")).alias("LNLSNET"), when(col("LNRE") < 0).then(null.cast(Int64)).otherwise(col("LNRE")).alias("LNRE"), when(col("LNRECONS") < 0).then(null.cast(Int64)).otherwise(col("LNRECONS")).alias("LNRECONS"), when(col("LNREMULT") < 0).then(null.cast(Int64)).otherwise(col("LNREMULT")).alias("LNREMULT"), when(col("LNRENRES") < 0).then(null.cast(Int64)).otherwise(col("LNRENRES")).alias("LNRENRES"), when(col("LNRERES") < 0).then(null.cast(Int64)).otherwise(col("LNRERES")).alias("LNRERES"), when(col("LNCI") < 0).then(null.cast(Int64)).otherwise(col("LNCI")).alias("LNCI"), when(col("LNCON") < 0).then(null.cast(Int64)).otherwise(col("LNCON")).alias("LNCON"), when(col("LNAG") < 0).then(null.cast(Int64)).otherwise(col("LNAG")).alias("LNAG"), when(col("LNATRES") < 0).then(null.cast(Int64)).otherwise(col("LNATRES")).alias("LNATRES"), when(col("NCLNLS") < 0).then(null.cast(Int64)).otherwise(col("NCLNLS")).alias("NCLNLS"), when(col("P3ASSET") < 0).then(null.cast(Int64)).otherwise(col("P3ASSET")).alias("P3ASSET"), when(col("P9ASSET") < 0).then(null.cast(Int64)).otherwise(col("P9ASSET")).alias("P9ASSET"), when(col("NAASSET") < 0).then(null.cast(Int64)).otherwise(col("NAASSET")).alias("NAASSET"), when(col("ORE") < 0).then(null.cast(Int64)).otherwise(col("ORE")).alias("ORE"), when(col("BRO") < 0).then(null.cast(Int64)).otherwise(col("BRO")).alias("BRO"), when(col("COREDEP") < 0).then(null.cast(Int64)).otherwise(col("COREDEP")).alias("COREDEP"), when(col("VOLIAB") < 0).then(null.cast(Int64)).otherwise(col("VOLIAB")).alias("VOLIAB"), when(col("FREPP") < 0).then(null.cast(Int64)).otherwise(col("FREPP")).alias("FREPP"), when(col("OTHBFHLB") < 0).then(null.cast(Int64)).otherwise(col("OTHBFHLB")).alias("OTHBFHLB")] 
+                FILTER col("ASSET") > 0
+                FROM
+                  SELECT [col("CERT"), col("REPDTE"), col("NAME"), col("STNAME"), col("BKCLASS"), col("SPECGRP"), col("ASSET"), col("DEP"), col("DEPDOM"), col("EQ"), col("BRO"), col("CHBAL"), col("SC"), col("COREDEP"), col("VOLIAB"), col("FREPP"), col("OTHBFHLB"), col("LNLSGR"), col("LNLSNET"), col("LNRE"), col("LNRECONS"), col("LNREMULT"), col("LNRENRES"), col("LNRERES"), col("LNCI"), col("LNCON"), col("LNAG"), col("LNATRES"), col("NCLNLS"), col("P3ASSET"), col("P9ASSET"), col("NAASSET"), col("NTLNLS"), col("ORE"), col("NETINC"), col("INTINC"), col("EINTEXP"), col("NONII"), col("NONIX"), col("ELNATR"), col("EQCDIV"), col("ROA"), col("ROE"), col("NIMY"), col("EQV"), col("RBC1AAJ"), col("RBCRWAJ"), col("IDT1RWAJR")]
+                    Parquet SCAN [C:/Users/ASUS/Desktop/Môn Bigdata/Final exam/data/curated/financials/year=1984/00000000.parquet, ... 42 other sources]
+                    PROJECT 48/49 COLUMNS
+                    ESTIMATED ROWS: 1711016
+      RIGHT PLAN ON: [col("CERT")]
+        SELECT [col("CERT"), col("FAILDATE"), col("fail_qi")]
+           WITH_COLUMNS:
+           [((col("FAILDATE").dt.year() * 4) + ((col("FAILDATE").dt.month().cast(Int32) - 1) // 3)).alias("fail_qi")] 
+            AGGREGATE[maintain_order: false]
+              [col("FAILDATE").min()] BY [col("CERT")]
+              FROM
+              FILTER col("CERT").is_not_null()
+              FROM
+                FILTER col("RESTYPE").str.to_uppercase().is_in([["FAILURE"]])
+                FROM
+                  Parquet SCAN [C:/Users/ASUS/Desktop/Môn Bigdata/Final exam/data/curated/failures.parquet]
+                  PROJECT */16 COLUMNS
+                  ESTIMATED ROWS: 4117
+      END LEFT JOIN

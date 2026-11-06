@@ -1,0 +1,2 @@
+model,train,valid,pr_auc,roc_auc,fit_seconds
+MLlib logistic (14 features),1986-1994,1996-2006,0.05852150130967396,0.8652431550161923,56.354168600000094

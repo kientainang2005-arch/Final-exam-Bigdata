@@ -1,0 +1,17 @@
+{
+ "raw_financial_rows": 1682616,
+ "panel_rows": 1681405,
+ "rows_removed": 1211,
+ "banks": 24062,
+ "failure_events_FAILURE_in_scope": 2845,
+ "failed_banks_with_a_positive_label_row": 2837,
+ "labelled_rows_upto_2025Q2": 1663876,
+ "positive_rows_upto_2025Q2": 10860,
+ "positive_rate_pct": 0.653,
+ "exit_types": {
+  "other exit (merger/closure)": 16910,
+  "active": 4313,
+  "failure": 2839
+ },
+ "build_seconds": 1.2
+}

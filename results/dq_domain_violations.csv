@@ -1,0 +1,18 @@
+rule,rows
+RBCRWAJ > 100 % (tiny RWA),18077
+EQ < 0 (balance-sheet insolvent),15659
+RBC1AAJ > 100 %,2786
+ORE < 0,646
+ASSET < 1 000 (under $1m),550
+EQV > 100 % or < -100 %,290
+|ROA| > 100 %,244
+SC < 0,96
+LNLSNET < 0,50
+LNLSGR < 0,32
+INTINC < 0,12
+LNATRES < 0,9
+LNRE < 0,6
+NCLNLS < 0,3
+CHBAL < 0,2
+NAASSET < 0,2
+LNCI < 0,2

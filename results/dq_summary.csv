@@ -1,0 +1,19 @@
+check,finding,rows/banks affected,handling in pipeline
+Completeness,0 quarters with row count != API total,0,download re-run until 0 (resumable manifest)
+Primary key,"0 duplicate (CERT, REPDTE)",0,assert in panel build (pipeline fails if > 0)
+Structural missingness,"fields not collected in early years: OTHBFHLB, P3ASSET",2,never imputed with future info: missing-indicator + training-block median; columns empty in a training block are dropped for that block
+Negative stock amounts,negative values in fields that cannot be negative,860,set to null (treated as a reporting error)
+Extreme ratios,ratios far outside economic range (tiny denominators),21397,ratios recomputed from amounts with safe division; winsorised at train-period 0.5/99.5 pct
+Zero used as missing,"risk-based capital ratios are 0 instead of null (pre-1990, and CBLR banks from 2020)",100% of 1984-89 rows,"capital ratios not used as model features; equity/assets (eq_ta), which exists in all eras, is used instead"
+Negative equity,insolvent banks report EQ < 0,15659,"kept: genuine (and highly informative) signal, not an error"
+Accounting identities,small share of rows break balance-sheet identities,12940,"rows kept: DEP > ASSET coincides with negative equity (insolvency), the rest is <0.05% of rows; ratios use safe division and winsorising"
+YTD flows,income items are cumulative within the calendar year,all rows,"de-cumulated: flow_q = YTD_q - YTD_{q-1} (same year, consecutive quarter), Q1 = YTD; annualised x4; null when previous quarter missing"
+Reporting gaps,missing quarters inside a bank's reporting history,32 banks,"lags/changes computed on the quarter index, not on row order; null when gap"
+Failures without Call Reports,in-scope failure events whose CERT never appears in Financials,6,cannot be labelled; reported as a (tiny) coverage limitation
+Reports after FAILDATE,failed institution keeps filing after FAILDATE (1989 RTC conservatorships),271,rows with REPDTE >= FAILDATE are dropped; label uses the first FAILURE date
+Repeated events per CERT,"assistance followed by failure, or two failures",44,first RESTYPE = FAILURE event defines the label; assistance is not a failure
+Exit classification,banks that stop reporting: failure vs. merger/other,19751 exited banks,failure iff CERT in Failures with RESTYPE=FAILURE; other exits keep label 0 and leave the panel after their last report
+Orphan CERTs,CERTs in Financials missing from Institutions,235,kept (Institutions not needed for features)
+Static attributes,"Institutions holds current, not historical, BKCLASS/STNAME/SPECGRP",4518 banks,use quarter-specific BKCLASS/STNAME from Financials
+Exit fields,ACTIVE/ENDEFYMD/CHANGEC are future information,all,never used as features
+Schema drift,column dtypes differ between quarter files,20,explicit schema cast in 02_storage.py

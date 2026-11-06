@@ -1,0 +1,18 @@
+# data must NOT be committed (exam rule)
+data_raw/
+data/
+*.parquet
+*.csv.gz
+*.csv
+!results/**/*.csv
+# environments / caches
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+spark-warehouse/
+metastore_db/
+derby.log
+logs/
+
+# course exam paper (instructor material, not redistributed)
+final_report_bft65b.pdf

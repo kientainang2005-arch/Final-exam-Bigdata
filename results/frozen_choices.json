@@ -1,0 +1,73 @@
+{
+ "chosen_model": "hgb",
+ "threshold": 0.005258678966199697,
+ "costs": {
+  "failures_used": 2034,
+  "median_loss_rate": 0.2019201480004899,
+  "median_cost_kusd": 9543.88637,
+  "avoidable_share": 0.25,
+  "C_FN_kusd": 2385.9715925,
+  "C_FP_kusd": 65.935,
+  "ratio_FN_FP": 36.18672317433836
+ },
+ "split": {
+  "dev": [
+   "1986-03-31",
+   "2006-12-31",
+   1049999,
+   7689,
+   2043
+  ],
+  "gap_rows_unused": 34754,
+  "test": [
+   "2008-03-31",
+   "2025-06-30",
+   435446,
+   2134,
+   545
+  ]
+ },
+ "features": [
+  "eq_ta",
+  "npl_ln",
+  "npa_ta",
+  "pd30_ta",
+  "ore_ta",
+  "texas",
+  "alll_ln",
+  "nco_ln",
+  "prov_ta",
+  "efficiency",
+  "roa_q",
+  "nim_q",
+  "div_payer",
+  "liq_ta",
+  "loans_ta",
+  "coredep_ta",
+  "brokered_dep",
+  "volliab_ta",
+  "fhlb_ta",
+  "cof_ta",
+  "cre_ta",
+  "constr_ta",
+  "resid_ln",
+  "ci_ln",
+  "cons_ln",
+  "ag_ln",
+  "log_assets",
+  "d4_eq_ta",
+  "d4_npa_ta",
+  "d4_npl_ln",
+  "d4_roa_q",
+  "g4_asset",
+  "g4_lnlsgr",
+  "roa_vol8",
+  "roa_4q",
+  "n_reports",
+  "state_npa_med",
+  "state_roa_med",
+  "npa_vs_state",
+  "fails_trailing4q_us"
+ ],
+ "frozen_at": "2026-11-06 11:46:50"
+}
