@@ -1,0 +1,426 @@
+
+=== src/01_download.py ===
+Downloading 170 quarters: 19840331 -> 20260630 into C:\Users\ASUS\Desktop\MÃ´n Bigdata\Final exam\data_raw\fdic
+
+[1/170] 19840331: already complete, skipped
+[2/170] 19840630: already complete, skipped
+[3/170] 19840930: already complete, skipped
+[4/170] 19841231: already complete, skipped
+[5/170] 19850331: already complete, skipped
+[6/170] 19850630: already complete, skipped
+[7/170] 19850930: already complete, skipped
+[8/170] 19851231: already complete, skipped
+[9/170] 19860331: already complete, skipped
+[10/170] 19860630: already complete, skipped
+[11/170] 19860930: already complete, skipped
+[12/170] 19861231: already complete, skipped
+[13/170] 19870331: already complete, skipped
+[14/170] 19870630: already complete, skipped
+[15/170] 19870930: already complete, skipped
+[16/170] 19871231: already complete, skipped
+[17/170] 19880331: already complete, skipped
+[18/170] 19880630: already complete, skipped
+[19/170] 19880930: already complete, skipped
+[20/170] 19881231: already complete, skipped
+[21/170] 19890331: already complete, skipped
+[22/170] 19890630: already complete, skipped
+[23/170] 19890930: already complete, skipped
+[24/170] 19891231: already complete, skipped
+[25/170] 19900331: already complete, skipped
+[26/170] 19900630: already complete, skipped
+[27/170] 19900930: already complete, skipped
+[28/170] 19901231: already complete, skipped
+[29/170] 19910331: already complete, skipped
+[30/170] 19910630: already complete, skipped
+[31/170] 19910930: already complete, skipped
+[32/170] 19911231: already complete, skipped
+[33/170] 19920331: already complete, skipped
+[34/170] 19920630: already complete, skipped
+[35/170] 19920930: already complete, skipped
+[36/170] 19921231: already complete, skipped
+[37/170] 19930331: already complete, skipped
+[38/170] 19930630: already complete, skipped
+[39/170] 19930930: already complete, skipped
+[40/170] 19931231: already complete, skipped
+[41/170] 19940331: already complete, skipped
+[42/170] 19940630: already complete, skipped
+[43/170] 19940930: already complete, skipped
+[44/170] 19941231: already complete, skipped
+[45/170] 19950331: already complete, skipped
+[46/170] 19950630: already complete, skipped
+[47/170] 19950930: already complete, skipped
+[48/170] 19951231: already complete, skipped
+[49/170] 19960331: already complete, skipped
+[50/170] 19960630: already complete, skipped
+[51/170] 19960930: already complete, skipped
+[52/170] 19961231: already complete, skipped
+[53/170] 19970331: already complete, skipped
+[54/170] 19970630: already complete, skipped
+[55/170] 19970930: already complete, skipped
+[56/170] 19971231: already complete, skipped
+[57/170] 19980331: already complete, skipped
+[58/170] 19980630: already complete, skipped
+[59/170] 19980930: already complete, skipped
+[60/170] 19981231: already complete, skipped
+[61/170] 19990331: already complete, skipped
+[62/170] 19990630: already complete, skipped
+[63/170] 19990930: already complete, skipped
+[64/170] 19991231: already complete, skipped
+[65/170] 20000331: already complete, skipped
+[66/170] 20000630: already complete, skipped
+[67/170] 20000930: already complete, skipped
+[68/170] 20001231: already complete, skipped
+[69/170] 20010331: already complete, skipped
+[70/170] 20010630: already complete, skipped
+[71/170] 20010930: already complete, skipped
+[72/170] 20011231: already complete, skipped
+[73/170] 20020331: already complete, skipped
+[74/170] 20020630: already complete, skipped
+[75/170] 20020930: already complete, skipped
+[76/170] 20021231: already complete, skipped
+[77/170] 20030331: already complete, skipped
+[78/170] 20030630: already complete, skipped
+[79/170] 20030930: already complete, skipped
+[80/170] 20031231: already complete, skipped
+[81/170] 20040331: already complete, skipped
+[82/170] 20040630: already complete, skipped
+[83/170] 20040930: already complete, skipped
+[84/170] 20041231: already complete, skipped
+[85/170] 20050331: already complete, skipped
+[86/170] 20050630: already complete, skipped
+[87/170] 20050930: already complete, skipped
+[88/170] 20051231: already complete, skipped
+[89/170] 20060331: already complete, skipped
+[90/170] 20060630: already complete, skipped
+[91/170] 20060930: already complete, skipped
+[92/170] 20061231: already complete, skipped
+[93/170] 20070331: already complete, skipped
+[94/170] 20070630: already complete, skipped
+[95/170] 20070930: already complete, skipped
+[96/170] 20071231: already complete, skipped
+[97/170] 20080331: already complete, skipped
+[98/170] 20080630: already complete, skipped
+[99/170] 20080930: already complete, skipped
+[100/170] 20081231: already complete, skipped
+[101/170] 20090331: already complete, skipped
+[102/170] 20090630: already complete, skipped
+[103/170] 20090930: already complete, skipped
+[104/170] 20091231: already complete, skipped
+[105/170] 20100331: already complete, skipped
+[106/170] 20100630: already complete, skipped
+[107/170] 20100930: already complete, skipped
+[108/170] 20101231: already complete, skipped
+[109/170] 20110331: already complete, skipped
+[110/170] 20110630: already complete, skipped
+[111/170] 20110930: already complete, skipped
+[112/170] 20111231: already complete, skipped
+[113/170] 20120331: already complete, skipped
+[114/170] 20120630: already complete, skipped
+[115/170] 20120930: already complete, skipped
+[116/170] 20121231: already complete, skipped
+[117/170] 20130331: already complete, skipped
+[118/170] 20130630: already complete, skipped
+[119/170] 20130930: already complete, skipped
+[120/170] 20131231: already complete, skipped
+[121/170] 20140331: already complete, skipped
+[122/170] 20140630: already complete, skipped
+[123/170] 20140930: already complete, skipped
+[124/170] 20141231: already complete, skipped
+[125/170] 20150331: already complete, skipped
+[126/170] 20150630: already complete, skipped
+[127/170] 20150930: already complete, skipped
+[128/170] 20151231: already complete, skipped
+[129/170] 20160331: already complete, skipped
+[130/170] 20160630: already complete, skipped
+[131/170] 20160930: already complete, skipped
+[132/170] 20161231: already complete, skipped
+[133/170] 20170331: already complete, skipped
+[134/170] 20170630: already complete, skipped
+[135/170] 20170930: already complete, skipped
+[136/170] 20171231: already complete, skipped
+[137/170] 20180331: already complete, skipped
+[138/170] 20180630: already complete, skipped
+[139/170] 20180930: already complete, skipped
+[140/170] 20181231: already complete, skipped
+[141/170] 20190331: already complete, skipped
+[142/170] 20190630: already complete, skipped
+[143/170] 20190930: already complete, skipped
+[144/170] 20191231: already complete, skipped
+[145/170] 20200331: already complete, skipped
+[146/170] 20200630: already complete, skipped
+[147/170] 20200930: already complete, skipped
+[148/170] 20201231: already complete, skipped
+[149/170] 20210331: already complete, skipped
+[150/170] 20210630: already complete, skipped
+[151/170] 20210930: already complete, skipped
+[152/170] 20211231: already complete, skipped
+[153/170] 20220331: already complete, skipped
+[154/170] 20220630: already complete, skipped
+[155/170] 20220930: already complete, skipped
+[156/170] 20221231: already complete, skipped
+[157/170] 20230331: already complete, skipped
+[158/170] 20230630: already complete, skipped
+[159/170] 20230930: already complete, skipped
+[160/170] 20231231: already complete, skipped
+[161/170] 20240331: already complete, skipped
+[162/170] 20240630: already complete, skipped
+[163/170] 20240930: already complete, skipped
+[164/170] 20241231: already complete, skipped
+[165/170] 20250331: already complete, skipped
+[166/170] 20250630: already complete, skipped
+[167/170] 20250930: already complete, skipped
+[168/170] 20251231: already complete, skipped
+[169/170] 20260331: already complete, skipped
+[170/170] 20260630: already complete, skipped
+
+failures    :  4,117 rows (API total 4,117)   3.3s
+institutions: 27,835 rows (API total 27,835)   4.7s
+
+=== Completeness check ===
+quarters downloaded     : 170
+total panel rows        : 1,682,616  (sum of API totals: 1,682,616)
+distinct banks (CERT)   : 24,064
+duplicate CERT-REPDTE   : 0
+incomplete quarters     : none
+failures in list        : 4,117
+=== done in 11s ===
+
+=== src/02_storage.py ===
+columns whose physical dtype drifts across raw quarter files: 20
+curated financials: 1,682,616 rows x 49 cols in 3.8s
+curated failures: 4,117 rows; institutions: 27,835 rows
+
+benchmark (1 warm-up + median of 5 runs, Polars reader unless stated):
+  CSV (uncompressed)                        518.9 MB  write   0.59s  all   7.54s  5 cols   6.75s  filter   6.14s
+  CSV + gzip                                213.6 MB  write  40.09s  all   5.56s  5 cols   2.30s  filter   2.42s
+  Parquet snappy (1 file)                   241.7 MB  write   0.38s  all   0.11s  5 cols   0.01s  filter   0.01s
+  Parquet zstd-3 (1 file)                   195.1 MB  write   0.62s  all   0.14s  5 cols   0.01s  filter   0.01s
+  Parquet zstd-3, partitioned by year       207.6 MB  write   0.89s  all   0.19s  5 cols   0.03s  filter   0.01s
+                             layout  size_MB  write_s  read_all_s  read_5cols_s  filter_2008_2010_s  size_vs_csv
+                 CSV (uncompressed)  518.879    0.593       7.537         6.749               6.138        1.000
+                         CSV + gzip  213.625   40.087       5.559         2.304               2.420        0.412
+            Parquet snappy (1 file)  241.680    0.380       0.110         0.010               0.011        0.466
+            Parquet zstd-3 (1 file)  195.050    0.615       0.142         0.014               0.012        0.376
+Parquet zstd-3, partitioned by year  207.608    0.889       0.187         0.028               0.013        0.400
+    CSV read with pandas (baseline)  518.879      NaN       5.477         1.363                 NaN        1.000
+=== done in 267s ===
+
+=== src/03_quality.py ===
+                            check                                                                               finding   rows/banks affected                                                                                                                      handling in pipeline
+0                    Completeness                                                0 quarters with row count != API total                     0                                                                                              download re-run until 0 (resumable manifest)
+1                     Primary key                                                            0 duplicate (CERT, REPDTE)                     0                                                                                             assert in panel build (pipeline fails if > 0)
+2          Structural missingness                                fields not collected in early years: OTHBFHLB, P3ASSET                     2                         not imputed with future info; missing-indicator + train-fitted median; model features chosen to exist in all eras
+3          Negative stock amounts                                     negative values in fields that cannot be negative                   860                                                                                         set to null (treated as reporting error), flagged
+4                  Extreme ratios                                 ratios far outside economic range (tiny denominators)                 21397                                                ratios recomputed from amounts with safe division; winsorised at train-period 0.5/99.5 pct
+5            Zero used as missing  risk-based capital ratios are 0 instead of null (pre-1990, and CBLR banks from 2020)  100% of 1984-89 rows                               capital ratios not used as model features; equity/assets (eq_ta), which exists in all eras, is used instead
+6                 Negative equity                                                         insolvent banks report EQ < 0                 15659                                                                               kept: genuine (and highly informative) signal, not an error
+7           Accounting identities                                    small share of rows break balance-sheet identities                 12940  rows kept: DEP > ASSET coincides with negative equity (insolvency), the rest is <0.05% of rows; ratios use safe division and winsorising
+8                       YTD flows                                  income items are cumulative within the calendar year              all rows    de-cumulated: flow_q = YTD_q - YTD_{q-1} (same year, consecutive quarter), Q1 = YTD; annualised x4; null when previous quarter missing
+9                  Reporting gaps                                    missing quarters inside a bank's reporting history              32 banks                                                               lags/changes computed on the quarter index, not on row order; null when gap
+10  Failures without Call Reports                        in-scope failure events whose CERT never appears in Financials                     6                                                                              cannot be labelled; reported as a (tiny) coverage limitation
+11         Reports after FAILDATE            failed institution keeps filing after FAILDATE (1989 RTC conservatorships)                   271                                                               rows with REPDTE >= FAILDATE are dropped; label uses the first FAILURE date
+12       Repeated events per CERT                                       assistance followed by failure, or two failures                    44                                                              first RESTYPE = FAILURE event defines the label; assistance is not a failure
+13            Exit classification                                   banks that stop reporting: failure vs. merger/other    19751 exited banks                   failure iff CERT in Failures with RESTYPE=FAILURE; other exits keep label 0 and leave the panel after their last report
+14                   Orphan CERTs                                         CERTs in Financials missing from Institutions                   235                                                                                               kept (Institutions not needed for features)
+15              Static attributes                    Institutions holds current, not historical, BKCLASS/STNAME/SPECGRP            4518 banks                                                                                       use quarter-specific BKCLASS/STNAME from Financials
+16                    Exit fields                                        ACTIVE/ENDEFYMD/CHANGEC are future information                   all                                                                                                                    never used as features
+17                   Schema drift                                            column dtypes differ between quarter files                    20                                                                                                     explicit schema cast in 02_storage.py
+=== done in 5s ===
+
+=== src/04_panel.py ===
+Optimised plan (excerpt):
+  WITH_COLUMNS:
+ [(((col("fail_qi") > col("qi")) & (col("fail_qi") <= (col("qi") + 4)))).fill_null([false]).strict_cast(Int8).alias("y"), (col("fail_qi") - col("qi")).alias("q_to_fail"), when(col("FAILDATE").is_not_null()).then("failure").otherwise(when(col("qi").max().over([col("CERT")]) < col("qi").max()).then("other exit (merger/closure)").otherwise("active")).alias("exit_type"), (col("qi").max().over([col("CERT")]) == col("qi")).alias("is_last_report")] 
+  FILTER (col("FAILDATE").is_null() | (col("REPDTE") < col("FAILDATE")))
+  FROM
+    LEFT JOIN:
+    LEFT PLAN ON: [col("CERT")]
+      simple Ï€ 57/57 ["CERT", "REPDTE", "NAME", ... 54 other columns]
+         WITH_COLUMNS:
+         [when(col("__POLARS_CSER_0x100000042")).then(col("NETINC")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == col("__POLARS_CSER_0x100000044")).then(col("NETINC") - col("NETINC").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("NETINC_Q"), when(col("__POLARS_CSER_0x100000042")).then(col("INTINC")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == col("__POLARS_CSER_0x100000044")).then(col("INTINC") - col("INTINC").shift([dyn int: 1]).over([col("CERT")])).otherwise(null.cast(Int64))).alias("INTINC_Q"), when(col("__POLARS_CSER_0x100000042")).then(col("EINTEXP")).otherwise(when(col("qi").shift([dyn int: 1]).over([col("CERT")]) == col("__POLARS_CSER_0x100000044")).then(col("EINTEXP") - col("EINTEXP").shift([dyn int: 1]).over([col("CERT")]) ...
+
+raw_financial_rows                        : 1682616
+panel_rows                                : 1681405
+rows_removed                              : 1211
+banks                                     : 24062
+failure_events_FAILURE_in_scope           : 2845
+failed_banks_with_a_positive_label_row    : 2837
+labelled_rows_upto_2025Q2                 : 1663876
+positive_rows_upto_2025Q2                 : 10860
+positive_rate_pct                         : 0.653
+exit_types                                : {'other exit (merger/closure)': 16910, 'active': 4313, 'failure': 2839}
+build_seconds                             : 1.2
+ year  bank_quarters  positive_rows  failures_next_q  failures
+ 1984          71752            427               69        83
+ 1985          71925            562               94       139
+ 1986          72136            777              155       162
+ 1987          70367            834              162       217
+ 1988          67691           1864              390       232
+ 1989          64685           1578              371       527
+ 1990          62506           1158              306       381
+ 1991          59921            777              209       268
+ 1992          57007            380              126       179
+ 1993          54479             85               25        50
+ 1994          51867             46               13        15
+ 1995          49100             22                5         8
+ 1996          46934              8                4         6
+ 1997          44937             10                1         1
+ 1998          43075             20                2         3
+ 1999          41701             28                5         8
+ 2000          40631             21                5         7
+ 2001          39352             37                7         4
+ 2002          38204             18                6        11
+ 2003          37447             19                5         3
+ 2004          36637              1                1         4
+ 2005          35915              0                0         0
+ 2006          35407              6                0         0
+ 2007          34754             48                3         3
+ 2008          34003            355               42        25
+ 2009          32916            670              160       140
+ 2010          31545            457              142       157
+ 2011          30230            269               82        92
+ 2012          29157            129               39        51
+ 2013          27989             79               25        24
+ 2014          26805             46               17        18
+ 2015          25521             23                5         8
+ 2016          24356             29                7         5
+ 2017          23325              9                5         8
+ 2018          22301              6                0         0
+ 2019          21366             19                5         4
+ 2020          20478              7                3         4
+ 2021          19942              0                0         0
+ 2022          19285             14                2         0
+ 2023          18798              9                2         5
+ 2024          18399              9                1         2
+ 2025           9030              4                1         2
+=== done in 3s ===
+
+=== src/05_benchmark.py ===
+machine: 8 logical cores, 15.6 GB RAM, polars 1.44.2, pandas 3.1.1
+  pandas                7.86 s   peak    2569 MB
+  polars-eager          1.36 s   peak    4450 MB
+  polars-lazy           1.04 s   peak    1561 MB
+  polars-streaming      1.37 s   peak    1104 MB
+max |pandas - polars| over all compared columns: {'polars-eager': 4.00096466894595e-09, 'polars-lazy': 4.00096466894595e-09, 'polars-streaming': 4.00096466894595e-09}
+  x2 pandas               19.20 s   peak    4505 MB
+  x2 polars-lazy           2.83 s   peak    2596 MB
+  x2 polars-streaming      3.11 s   peak    1745 MB
+  x4 pandas               37.00 s   peak    7884 MB
+  x4 polars-lazy           5.10 s   peak    4208 MB
+  x4 polars-streaming      5.67 s   peak    2920 MB
+  x8 polars-lazy          11.52 s   peak    7350 MB
+  x8 polars-streaming     15.14 s   peak    5648 MB
+          engine  scale  rows_out  seconds_median  seconds_min  peak_mb_median
+          pandas      1   1681405        7.857562     7.848774     2568.589844
+    polars-eager      1   1681405        1.357022     1.348951     4450.152344
+     polars-lazy      1   1681405        1.036266     1.004327     1561.414062
+polars-streaming      1   1681405        1.373189     1.348826     1103.843750
+          pandas      2   3364021       19.201716    19.201716     4504.625000
+     polars-lazy      2   3364021        2.827301     2.827301     2596.003906
+polars-streaming      2   3364021        3.114885     3.114885     1745.093750
+          pandas      4   6729253       37.004952    37.004952     7883.992188
+     polars-lazy      4   6729253        5.102223     5.102223     4207.503906
+polars-streaming      4   6729253        5.673427     5.673427     2920.082031
+     polars-lazy      8  13459717       11.523915    11.523915     7350.003906
+polars-streaming      8  13459717       15.138056    15.138056     5648.378906
+=== done in 167s ===
+
+=== src/06_features.py ===
+feature table: 1,681,405 rows x 40 features in 3.2s
+            feature group                                         rationale  missing_pct  median_failing (y=1)  median_others (y=0)
+              eq_ta     C                     equity cushion against losses         0.25              0.016699             0.092470
+             npl_ln     A                           non-current loans share         1.27              0.098462             0.009190
+             npa_ta     A        non-performing assets incl. repossessed RE         0.15              0.107138             0.007243
+            pd30_ta     A                     early delinquency, leads NPLs        58.34              0.023548             0.004139
+             ore_ta     A                            foreclosed real estate         0.28              0.030545             0.000512
+              texas     A  Texas ratio: bad assets / loss-absorbing capital         0.38              1.665842             0.068783
+            alll_ln     A                           loan-loss reserve level         1.37              0.030582             0.012552
+             nco_ln     A                        annualised net charge-offs         6.12              0.019044             0.000533
+            prov_ta     A                             annualised provisions         2.89              0.010475             0.001116
+         efficiency     M                                     cost / income         1.73              1.205761             0.668293
+              roa_q     E           annualised quarterly ROA (de-cumulated)         0.59             -0.029121             0.009619
+              nim_q     E                    annualised net interest margin         0.66              0.022226             0.037131
+          div_payer     E                       pays dividends this quarter         0.00              0.000000             0.000000
+             liq_ta     L                                     liquid assets         0.01              0.191601             0.305678
+           loans_ta     L                                    loan-to-assets         0.00              0.679682             0.613225
+         coredep_ta     L                                    stable funding         0.08              0.808769             0.773605
+       brokered_dep     L                                         hot money         1.71              0.000000             0.000000
+         volliab_ta     L                              volatile liabilities         0.25              0.162621             0.097787
+            fhlb_ta     L                              wholesale borrowings        49.67              0.059893             0.009236
+             cof_ta     S                  cost of funds (rate sensitivity)         0.66              0.061341             0.030880
+             cre_ta     S                       commercial RE concentration         0.22              0.172026             0.106843
+          constr_ta     S                   construction & land development         0.18              0.029775             0.013531
+           resid_ln     S                              1-4 family mortgages         1.30              0.255839             0.272025
+              ci_ln     S                                         C&I loans         1.12              0.115692             0.126808
+            cons_ln     S                                    consumer loans         1.35              0.071833             0.090282
+              ag_ln     S                                agricultural loans        12.66              0.000000             0.014087
+         log_assets  size           size (too-big-to-fail, diversification)         0.00             11.230131            11.350036
+           d4_eq_ta   dyn      change over 4 quarters (deterioration speed)         5.93             -0.030894             0.000739
+          d4_npa_ta   dyn      change over 4 quarters (deterioration speed)         5.85              0.028627            -0.000073
+          d4_npl_ln   dyn      change over 4 quarters (deterioration speed)         6.91              0.025023            -0.000051
+           d4_roa_q   dyn      change over 4 quarters (deterioration speed)         6.26             -0.015025             0.000080
+           g4_asset   dyn 4-quarter growth (rapid growth precedes failures)         5.70             -0.082709             0.052648
+          g4_lnlsgr   dyn 4-quarter growth (rapid growth precedes failures)         6.72             -0.110600             0.063026
+           roa_vol8   dyn          earnings volatility, trailing 8 quarters         4.86              0.038381             0.003890
+             roa_4q   dyn                       trailing 4-quarter mean ROA         2.03             -0.034620             0.009500
+          n_reports   dyn        length of reporting history (de novo risk)         0.00             21.000000            46.000000
+      state_npa_med   ctx                  state-level stress, same quarter         0.00              0.022838             0.007092
+      state_roa_med   ctx                  state-level stress, same quarter         0.01              0.005936             0.009814
+       npa_vs_state   ctx                 bank NPA relative to state median         0.15              0.081530            -0.000019
+fails_trailing4q_us   ctx       US failures in the past 4 quarters (public)         0.00            201.000000            25.000000
+
+point-in-time truncation test:
+  PIT test cut-off 1991-12-31: 540,983 rows x 40 features identical (max diff 0.0e+00)
+  PIT test cut-off 2009-06-30: 1,279,056 rows x 40 features identical (max diff 0.0e+00)
+  PIT test cut-off 2023-03-31: 1,622,389 rows x 40 features identical (max diff 0.0e+00)
+=== done in 19s ===
+
+=== src/07_model.py ===
+split [start, end, rows, positive rows, failing banks]: {'dev': ['1986-03-31', '2006-12-31', 1049999, 7689, 2043], 'gap_rows_unused': 34754, 'test': ['2008-03-31', '2025-06-30', 435446, 2134, 545]}
+baseline_logit_5   mean PR-AUC 0.1631  ROC-AUC 0.9032
+logit_all          mean PR-AUC 0.2422  ROC-AUC 0.9011
+  hgb {'learning_rate': 0.05, 'max_leaf_nodes': 15, 'min_samples_leaf': 50, 'max_iter': 300, 'l2_regularization': 1.0} -> mean PR-AUC 0.3620
+  hgb {'learning_rate': 0.05, 'max_leaf_nodes': 15, 'min_samples_leaf': 200, 'max_iter': 300, 'l2_regularization': 1.0} -> mean PR-AUC 0.3718
+  hgb {'learning_rate': 0.05, 'max_leaf_nodes': 31, 'min_samples_leaf': 50, 'max_iter': 300, 'l2_regularization': 1.0} -> mean PR-AUC 0.3651
+  hgb {'learning_rate': 0.05, 'max_leaf_nodes': 31, 'min_samples_leaf': 200, 'max_iter': 300, 'l2_regularization': 1.0} -> mean PR-AUC 0.3717
+  hgb {'learning_rate': 0.1, 'max_leaf_nodes': 15, 'min_samples_leaf': 50, 'max_iter': 150, 'l2_regularization': 1.0} -> mean PR-AUC 0.3598
+  hgb {'learning_rate': 0.1, 'max_leaf_nodes': 15, 'min_samples_leaf': 200, 'max_iter': 150, 'l2_regularization': 1.0} -> mean PR-AUC 0.3549
+  hgb {'learning_rate': 0.1, 'max_leaf_nodes': 31, 'min_samples_leaf': 50, 'max_iter': 150, 'l2_regularization': 1.0} -> mean PR-AUC 0.3372
+  hgb {'learning_rate': 0.1, 'max_leaf_nodes': 31, 'min_samples_leaf': 200, 'max_iter': 150, 'l2_regularization': 1.0} -> mean PR-AUC 0.3565
+hgb                mean PR-AUC 0.3718  ROC-AUC 0.9593
+                    pr_auc   roc_auc  recall_top1pct  recall_top5pct     brier
+model                                                                         
+baseline_logit_5  0.163114  0.903248        0.492598        0.742668  0.007899
+hgb               0.371837  0.959307        0.573107        0.822681  0.006104
+logit_all         0.242197  0.901122        0.517699        0.741242  0.006730
+frozen: {"chosen_model": "hgb", "threshold": 0.005258678966199697, "costs": {"failures_used": 2034, "median_loss_rate": 0.2019201480004899, "median_cost_kusd": 9543.88637, "avoidable_share": 0.25, "C_FN_kusd": 2385.9715925, "C_FP_kusd": 65.935, "ratio_FN_FP": 36.18672317433836}}
+
+TEST (evaluated once):
+                   pr_auc  roc_auc  recall_top1pct  ...      tp      fp     fn
+baseline_logit_5  0.5420   0.9779          0.7310  ...  1677.0  4021.0  457.0
+logit_all         0.5583   0.9802          0.7423  ...  1599.0  2880.0  535.0
+hgb               0.5542   0.9828          0.7591  ...  1887.0  7697.0  247.0
+
+[3 rows x 10 columns]
+{'failed_banks_in_test': 545, 'flagged_at_least_once': 526, 'median_lead_quarters': 4.0, 'alarms_total': 9584, 'bank_quarters': 435446}
+done in 474s
+=== done in 486s ===
+Installed kernelspec bft65b in C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\share\jupyter\kernels\bft65b
+written notebooks/08_spark_demo.ipynb
+[NbConvertApp] Converting notebook notebooks/08_spark_demo.ipynb to notebook
+C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\zmq\_future.py:718: RuntimeWarning: Proactor event loop does not implement add_reader family of methods required for zmq. Registering an additional selector thread for add_reader support via tornado. Use `asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())` to avoid this warning.
+  self._get_loop()
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+The system cannot find the path specified.
+Missing Python executable 'C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Scripts\python.exe', defaulting to 'C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\pyspark\bin\..' for SPARK_HOME environment variable. Please install Python or specify the correct Python executable in PYSPARK_DRIVER_PYTHON or PYSPARK_PYTHON environment variable to detect SPARK_HOME safely.
+WARNING: Using incubator modules: jdk.incubator.vector
+26/11/06 11:48:33 WARN Shell: Did not find winutils.exe: java.io.FileNotFoundException: java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset. -see https://cwiki.apache.org/confluence/display/HADOOP2/WindowsProblems
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/11/06 11:48:34 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+[Stage 0:>                                                         (0 + 8) / 43][Stage 0:>                                                        (0 + 13) / 43][Stage 0:=>                                                       (1 + 12) / 43][Stage 0:=============>                                          (10 + 10) / 43][Stage 0:==================================>                      (26 + 8) / 43][Stage 0:======================================>                  (29 + 8) / 43][Stage 0:==============================================>          (35 + 8) / 43][Stage 0:=================================================>       (37 + 6) / 43]                                                                                [Stage 1:>                                                          (0 + 1) / 1]                                                                                [Stage 2:>                                                          (0 + 8) / 9][Stage 2:>                                                          (0 + 9) / 9][Stage 2:====================================================>      (8 + 1) / 9]                                                                                [Stage 6:>                                                          (0 + 8) / 9][Stage 6:>                  (0 + 8) / 9][Stage 7:>                  (0 + 0) / 1][Stage 6:==>                (1 + 8) / 9][Stage 7:>                  (0 + 0) / 1][Stage 6:====>              (2 + 7) / 9][Stage 7:>                  (0 + 1) / 1][Stage 6:======>            (3 + 6) / 9][Stage 7:>                  (0 + 1) / 1][Stage 6:============>      (6 + 3) / 9][Stage 7:>                  (0 + 1) / 1][Stage 6:==============>    (7 + 2) / 9][Stage 7:>                  (0 + 1) / 1][Stage 6:================>  (8 + 1) / 9][Stage 7:>                  (0 + 1) / 1][Stage 7:>                                                          (0 + 1) / 1]                                                                                [Stage 11:>                                                         (0 + 8) / 9][Stage 11:>                 (0 + 8) / 9][Stage 13:>                (0 + 0) / 10][Stage 11:==>               (1 + 8) / 9][Stage 13:>                (0 + 0) / 10][Stage 11:====>             (2 + 7) / 9][Stage 13:>                (0 + 1) / 10][Stage 11:======>           (3 + 6) / 9][Stage 13:>                (0 + 2) / 10][Stage 11:==========>       (5 + 4) / 9][Stage 13:>                (0 + 4) / 10][Stage 11:============>     (6 + 3) / 9][Stage 13:>                (0 + 5) / 10][Stage 11:================> (8 + 1) / 9][Stage 13:>                (0 + 7) / 10][Stage 13:>                                                        (0 + 8) / 10][Stage 13:=====>                                                   (1 + 8) / 10][Stage 13:===========>                                             (2 + 8) / 10][Stage 13:======================>                                  (4 + 6) / 10][Stage 13:==================================>                      (6 + 4) / 10][Stage 13:=============================================>           (8 + 2) / 10][Stage 17:>                                                        (0 + 8) / 12][Stage 17:====>                                                    (1 + 8) / 12][Stage 17:============================>                            (6 + 6) / 12][Stage 17:=================================>                       (7 + 5) / 12][Stage 17:======================================>                  (8 + 4) / 12][Stage 17:==========================================>              (9 + 3) / 12][Stage 17:==============================================>         (10 + 2) / 12][Stage 22:>                                                        (0 + 8) / 11][Stage 22:===============>                                         (3 + 8) / 11][Stage 22:=========================>                               (5 + 6) / 11][Stage 22:===============================>                         (6 + 5) / 11][Stage 22:=========================================>               (8 + 3) / 11][Stage 22:==============================================>          (9 + 2) / 11][Stage 22:==================================================>     (10 + 1) / 11][Stage 28:>                                                        (0 + 8) / 12][Stage 28:>                                                        (0 + 9) / 12][Stage 28:>                                                       (0 + 12) / 12][Stage 28:====>                                                   (1 + 11) / 12][Stage 28:=========>                                              (2 + 10) / 12][Stage 28:===================>                                     (4 + 8) / 12][Stage 28:=======================>                                 (5 + 7) / 12][Stage 28:============================>                            (6 + 6) / 12][Stage 28:=================================>                       (7 + 5) / 12][Stage 28:======================================>                  (8 + 4) / 12][Stage 28:==========================================>              (9 + 3) / 12][Stage 28:==============================================>         (10 + 2) / 12][Stage 28:===================================================>    (11 + 1) / 12]                                                                                [Stage 29:>                 (0 + 8) / 9][Stage 30:>                 (0 + 0) / 1][Stage 29:============>                                             (2 + 7) / 9][Stage 29:================================>                         (5 + 4) / 9]                                                                                [Stage 34:>                                                         (0 + 8) / 9][Stage 34:==>               (1 + 8) / 9][Stage 36:>                (0 + 0) / 10][Stage 34:============>     (6 + 3) / 9][Stage 36:>                (0 + 5) / 10][Stage 34:================> (8 + 1) / 9][Stage 36:>                (0 + 7) / 10][Stage 36:>                                                        (0 + 8) / 10][Stage 36:===========>                                             (2 + 8) / 10][Stage 36:======================>                                  (4 + 6) / 10][Stage 36:=======================================>                 (7 + 3) / 10][Stage 36:=============================================>           (8 + 2) / 10][Stage 40:>                                                        (0 + 8) / 12][Stage 40:=================================>                       (7 + 5) / 12][Stage 40:==========================================>              (9 + 3) / 12][Stage 45:>                                                        (0 + 8) / 11][Stage 45:=====>                                                   (1 + 8) / 11][Stage 45:===============>                                         (3 + 8) / 11][Stage 45:=========================>                               (5 + 6) / 11][Stage 45:===============================>                         (6 + 5) / 11][Stage 45:==============================================>          (9 + 2) / 11][Stage 45:==================================================>     (10 + 1) / 11][Stage 51:>                                                        (0 + 8) / 16][Stage 51:==============>                                          (4 + 8) / 16][Stage 51:=================>                                       (5 + 8) / 16][Stage 51:============================>                            (8 + 8) / 16][Stage 51:================================>                        (9 + 7) / 16][Stage 51:======================================>                 (11 + 5) / 16][Stage 51:====================================================>   (15 + 1) / 16]                                                                                [Stage 70:>                                                        (0 + 8) / 16][Stage 70:=======>                                                 (2 + 8) / 16][Stage 70:==============>                                          (4 + 8) / 16][Stage 70:=================>                                       (5 + 8) / 16][Stage 70:============================>                            (8 + 8) / 16][Stage 70:======================================>                 (11 + 5) / 16][Stage 70:==========================================>             (12 + 4) / 16][Stage 70:=================================================>      (14 + 2) / 16][Stage 77:>                                                         (0 + 8) / 8][Stage 77:==============>                                           (2 + 6) / 8][Stage 77:=====================>                                    (3 + 5) / 8][Stage 77:====================================>                     (5 + 3) / 8]                                                                                [Stage 83:>                                                        (0 + 8) / 16][Stage 83:===>                                                     (1 + 8) / 16][Stage 83:=======>                                                 (2 + 8) / 16][Stage 83:==============>                                          (4 + 8) / 16][Stage 83:=================>                                       (5 + 8) / 16][Stage 83:========================>                                (7 + 8) / 16][Stage 83:============================>                            (8 + 8) / 16][Stage 83:================================>                        (9 + 7) / 16][Stage 83:==========================================>             (12 + 4) / 16][Stage 83:=================================================>      (14 + 2) / 16][Stage 90:>                                                         (0 + 4) / 4][Stage 90:===========================================>              (3 + 1) / 4]                                                                                [Stage 96:>                                                        (0 + 8) / 16][Stage 96:=======>                                                 (2 + 8) / 16][Stage 96:==========>                                              (3 + 8) / 16][Stage 96:=================>                                       (5 + 8) / 16][Stage 96:============================>                            (8 + 8) / 16][Stage 96:================================>                        (9 + 7) / 16][Stage 96:==========================================>             (12 + 4) / 16][Stage 96:=============================================>          (13 + 3) / 16]                                                                                [Stage 109:>                                                       (0 + 8) / 16][Stage 109:===>                                                    (1 + 8) / 16][Stage 109:==========>                                             (3 + 8) / 16][Stage 109:=====================>                                  (6 + 8) / 16][Stage 109:============================>                           (8 + 8) / 16][Stage 109:==================================>                    (10 + 6) / 16][Stage 109:=========================================>             (12 + 4) / 16][Stage 109:============================================>          (13 + 3) / 16][Stage 109:===================================================>   (15 + 1) / 16]                                                                                netlib-blas: JNI_OnLoad: dlopen(libopenblas.dll) failed: LoadLibrary failed
+[Stage 117:>                                                       (0 + 8) / 16][Stage 117:==============>                                         (4 + 8) / 16][Stage 117:============================>                           (8 + 8) / 16][Stage 117:===============================>                        (9 + 7) / 16][Stage 117:=====================================>                 (11 + 5) / 16][Stage 117:=========================================>             (12 + 4) / 16][Stage 117:===================================================>   (15 + 1) / 16]                                                                                [Stage 325:>                                                       (0 + 8) / 16][Stage 325:>                                                       (0 + 9) / 16][Stage 325:============================>                           (8 + 8) / 16][Stage 325:==================================>                    (10 + 6) / 16][Stage 325:=========================================>             (12 + 4) / 16][Stage 326:>                                                       (0 + 8) / 16][Stage 326:============================>                           (8 + 8) / 16]                                                                                [Stage 333:>                                                       (0 + 8) / 16][Stage 333:============================>                           (8 + 8) / 16][Stage 334:>                                                       (0 + 8) / 16][Stage 334:===>                                                    (1 + 8) / 16][Stage 334:============================>                           (8 + 8) / 16][Stage 334:=====================================>                 (11 + 5) / 16]                                                                                [Stage 342:==========>                                             (3 + 8) / 16][Stage 342:========================>                               (7 + 8) / 16][Stage 342:============================>                           (8 + 8) / 16][Stage 342:============================================>          (13 + 3) / 16]                                                                                [Stage 358:============================>                           (8 + 8) / 16][Stage 358:===============================>                        (9 + 7) / 16][Stage 358:=========================================>             (12 + 4) / 16]                                                                                [Stage 364:>                                                       (0 + 8) / 16][Stage 364:=======>                                                (2 + 8) / 16][Stage 364:========================>                               (7 + 8) / 16][Stage 364:============================>                           (8 + 8) / 16][Stage 364:==================================>                    (10 + 6) / 16][Stage 364:=========================================>             (12 + 4) / 16][Stage 364:================================================>      (14 + 2) / 16][Stage 365:============================>                           (8 + 8) / 16]                                                                                [Stage 372:>                                                       (0 + 8) / 16][Stage 372:=====================>                                  (6 + 8) / 16][Stage 372:========================>                               (7 + 8) / 16][Stage 372:============================>                           (8 + 8) / 16][Stage 372:================================================>      (14 + 2) / 16][Stage 373:>                                                       (0 + 8) / 16][Stage 373:===>                                                    (1 + 8) / 16][Stage 373:============================>                           (8 + 8) / 16][Stage 373:=====================================>                 (11 + 5) / 16][Stage 373:=========================================>             (12 + 4) / 16]                                                                                [Stage 381:>                                                       (0 + 8) / 16][Stage 381:===>                                                    (1 + 8) / 16][Stage 381:========================>                               (7 + 8) / 16][Stage 381:============================>                           (8 + 8) / 16][Stage 381:==================================>                    (10 + 6) / 16][Stage 381:================================================>      (14 + 2) / 16][Stage 381:===================================================>   (15 + 1) / 16]                                                                                [Stage 389:>                                                       (0 + 8) / 16][Stage 389:===>                                                    (1 + 8) / 16][Stage 389:========================>                               (7 + 8) / 16][Stage 389:============================>                           (8 + 8) / 16][Stage 389:=====================================>                 (11 + 5) / 16][Stage 389:================================================>      (14 + 2) / 16]                                                                                ERROR: The process "3488" not found.
+[NbConvertApp] Writing 47117 bytes to notebooks\08_spark_demo.ipynb
+
+All steps finished. Results in results/, figures in results/figures/.

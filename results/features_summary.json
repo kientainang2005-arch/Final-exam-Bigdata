@@ -1,7 +1,7 @@
 {
  "rows": 1681405,
  "n_features": 40,
- "seconds": 3.2,
+ "seconds": 6.7,
  "pit_test": [
   {
    "cutoff": "1991-12-31",

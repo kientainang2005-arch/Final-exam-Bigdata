@@ -12,7 +12,9 @@ __pycache__/
 spark-warehouse/
 metastore_db/
 derby.log
-logs/
+logs/*
+!logs/download.log
+!logs/run_all.log
 
 # course exam paper (instructor material, not redistributed)
 final_report_bft65b.pdf

@@ -30,8 +30,8 @@ d4_eq_ta,dyn,change over 4 quarters (deterioration speed),5.9300,-0.0309,0.0007
 d4_npa_ta,dyn,change over 4 quarters (deterioration speed),5.8500,0.0286,-0.0001
 d4_npl_ln,dyn,change over 4 quarters (deterioration speed),6.9100,0.0250,-0.0001
 d4_roa_q,dyn,change over 4 quarters (deterioration speed),6.2600,-0.0150,0.0001
-g4_asset,dyn,4-quarter growth (rapid growth precedes failures),5.7000,-0.0827,0.0526
-g4_lnlsgr,dyn,4-quarter growth (rapid growth precedes failures),6.7200,-0.1106,0.0630
+g4_asset,dyn,4-quarter growth (shrinking balance sheet = distress; boom growth = earlier risk),5.7000,-0.0827,0.0526
+g4_lnlsgr,dyn,4-quarter growth (shrinking balance sheet = distress; boom growth = earlier risk),6.7200,-0.1106,0.0630
 roa_vol8,dyn,"earnings volatility, trailing 8 quarters",4.8600,0.0384,0.0039
 roa_4q,dyn,trailing 4-quarter mean ROA,2.0300,-0.0346,0.0095
 n_reports,dyn,length of reporting history (de novo risk),0.0000,21.0000,46.0000

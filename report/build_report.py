@@ -185,11 +185,16 @@ def T(df: pd.DataFrame, caption: str, widths=None, size=8.5, bold_rows=()):
             run.font.size = Pt(size)
             if i in bold_rows:
                 run.bold = True
-    if len(df) <= 25:   # keep short tables (and their caption) on one page
-        for row in t.rows[:-1]:
-            for cell in row.cells:
-                for par in cell.paragraphs:
-                    par.paragraph_format.keep_with_next = True
+    # short tables stay on one page; long tables keep caption + header + first 3 rows together
+    # and repeat the header row on every page
+    keep = t.rows[:-1] if len(df) <= 25 else t.rows[:4]
+    for row in keep:
+        for cell in row.cells:
+            for par in cell.paragraphs:
+                par.paragraph_format.keep_with_next = True
+    if len(df) > 25:
+        trPr = t.rows[0]._tr.get_or_add_trPr()
+        hdr = OxmlElement("w:tblHeader"); hdr.set(qn("w:val"), "true"); trPr.append(hdr)
     if widths:
         for row in t.rows:
             for j, w in enumerate(widths):
@@ -582,19 +587,30 @@ P(f"The baseline is the classic supervisory logit on five CAMELS ratios (equity/
   f"walk-forward PR-AUC (learning rate {hgbp['learning_rate']}, {hgbp['max_leaf_nodes']} leaves, at least "
   f"{hgbp['min_samples_leaf']} rows per leaf, {hgbp['max_iter']} trees). HGB is clearly best on every development metric "
   f"and was selected; the model, features and threshold were frozen to results/frozen_choices.json before the test "
-  f"period was read.")
+  f"period was read. No choice was revisited after the test evaluation; the end-to-end reproducibility run "
+  f"(run_all.py, log in logs/run_all.log) recomputes the same frozen choices and the identical test metrics "
+  f"deterministically.")
 FIGURE(FIG / "model_pr_and_cost.png", "Left: pooled out-of-fold PR curves on the development period (AP of the pooled "
        "predictions, therefore different from the per-fold means in Table 7). Right: expected cost vs. alarm threshold.", 16.5)
 H("6.3 Alarm threshold from costs", 2)
+_r = costs["ratio_FN_FP"]
+_s = sens.set_index("C_FP multiplier")
 P(f"The threshold minimises expected cost C_FN·FN + C_FP·FP on the pooled out-of-fold development predictions. Both costs "
-  f"come from development-period data: the median loss to the deposit insurance fund of the {costs['failures_used']:,} "
-  f"failures in {dev_s[:4]}–{dev_e[:4]} with a recorded COST is ${costs['median_cost_kusd'] / 1e3:.2f} M "
-  f"(median loss rate {pct(costs['median_loss_rate'], 1)} of the failed bank's assets). Assuming that early "
-  f"supervisory action avoids {pct(costs['avoidable_share'], 0)} of that loss gives a missed-failure cost "
-  f"C_FN = ${costs['C_FN_kusd'] / 1e3:.2f} M. A false alarm triggers an unnecessary targeted examination, valued at 0.1% "
-  f"of the median bank's assets: C_FP = ${costs['C_FP_kusd']:.0f} k. The ratio is {costs['ratio_FN_FP']:.0f}:1 and the "
-  f"cost-minimising threshold is p = {thr:.4f}. Because the 25% and 0.1% are assumptions, Table 8 shows how the threshold "
-  f"responds to C_FP.")
+  f"are estimated from development-period data. **Missed failure:** the median loss to the deposit insurance fund of the "
+  f"{costs['failures_used']:,} failures in {dev_s[:4]}–{dev_e[:4]} with a recorded COST is "
+  f"${costs['median_cost_kusd'] / 1e3:.2f} M (median loss rate {pct(costs['median_loss_rate'], 1)} of the failed bank's "
+  f"assets); assuming that early supervisory action avoids {pct(costs['avoidable_share'], 0)} of that loss gives "
+  f"C_FN = ${costs['C_FN_kusd'] / 1e3:.2f} M. **False alarm:** an unnecessary targeted examination of a healthy bank, "
+  f"valued at 0.1% of the median development-period bank's assets (${costs['C_FP_kusd'] / 0.001 / 1e3:.0f} M): "
+  f"C_FP = ${costs['C_FP_kusd']:.0f} k. The cost-minimising threshold is p = {thr:.4f}.")
+P(f"Only the ratio C_FN/C_FP = {_r:.0f}:1 matters for the threshold (scaling both costs leaves it unchanged), so the two "
+  f"parameters that are not directly observable – the avoidable share and the examination cost – act only through this "
+  f"ratio. Table 8 varies C_FP from 0.25× to 4×, i.e. the ratio from {_r * 4:.0f}:1 to {_r / 4:.0f}:1. This is "
+  f"equivalent to an avoidable share between 100% and {100 * costs['avoidable_share'] / 4:.0f}% of the loss, or an "
+  f"examination cost between 0.025% and 0.4% of assets, and therefore covers the plausible range of both assumptions. "
+  f"Across it the threshold stays between {_s.threshold.min():.4f} and {_s.threshold.max():.4f} and development recall "
+  f"between {pct(_s.recall.min(), 0)} and {pct(_s.recall.max(), 0)}: the conclusion – a low threshold that accepts many "
+  f"false alarms in exchange for high recall, because a miss is far more expensive – does not depend on the exact values.")
 ss = sens.copy()
 ss["threshold"] = ss.threshold.map(lambda v: f"{v:.4f}")
 ss["recall"] = ss.recall.map(pct); ss["precision"] = ss.precision.map(pct)
@@ -668,12 +684,14 @@ B(["The API serves the latest amended Call Reports, not the vintages available a
    "30–60 days after quarter end; a production EWS would need vintage data and a publication lag in the label window.",
    "Failures cluster in two crises; the test period is dominated by 2009–2011, so performance in calm periods (2015–2025, "
    "a handful of failures per year) is estimated with large uncertainty.",
-   "The two cost parameters (avoidable share of loss and examination cost) are assumptions; Table 8 shows the threshold "
-   "is sensitive to them. Assisted banks are treated as non-failures, a defensible but debatable choice.",
+   "The avoidable share of loss and the examination cost are not observed in the FDIC data; the exact threshold moves "
+   "with them (Table 8), although the operating regime does not. A supervisor would replace them with its own "
+   "examination budget. Assisted banks are treated as non-failures (their charter survives), a defensible but debatable "
+   "choice.",
    "Timings come from one laptop running x64 Python under emulation on an ARM CPU; ratios between engines are more "
    "reliable than absolute numbers. The ×2–×8 scaling uses replicated data with the same distribution."])
 H("What would change for Vietnam", 2)
-B(["**Scale and tools:** about 50 credit institutions reporting monthly to the SBV is a much smaller panel, so the same "
+B(["**Scale and tools:** about 50 banks reporting to the State Bank of Vietnam (SBV) form a much smaller panel, so the same "
    "Parquet + Polars design is more than enough; Spark becomes relevant only for loan-level data from the Credit "
    "Information Centre (CIC).",
    "**Labels:** Vietnam has had very few formal bank failures; distress appears as special control, compulsory "
@@ -720,7 +738,7 @@ FIGURE(FIG / "dq_missing_by_era.png", "Share of missing values by field and era.
 H("C. Feature dictionary", 2)
 fd = fdict.copy()
 for c in ("median_failing (y=1)", "median_others (y=0)"):
-    fd[c] = fd[c].map(lambda v: "" if pd.isna(v) else f"{v:.4g}")
+    fd[c] = fd[c].map(lambda v: "" if pd.isna(v) else ("0" if abs(v) < 5e-5 else f"{v:.4g}"))
 fd["missing_pct"] = fd.missing_pct.map(lambda v: f"{v:.1f}")
 fd.columns = ["Feature", "Group", "Rationale", "Missing %", "Median, y=1", "Median, y=0"]
 T(fd, "Feature dictionary (labelled rows up to 2025Q2).", widths=[2.6, 1.2, 7.2, 1.6, 2.0, 2.0], size=7.5)

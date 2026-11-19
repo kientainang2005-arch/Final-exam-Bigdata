@@ -67,7 +67,7 @@ def main() -> None:
     groups = {n: g for n, (_, g, _) in RATIOS.items()}
     why = {n: r for n, (_, _, r) in RATIOS.items()}
     extra = {"d4_": ("dyn", "change over 4 quarters (deterioration speed)"),
-             "g4_": ("dyn", "4-quarter growth (rapid growth precedes failures)"),
+             "g4_": ("dyn", "4-quarter growth (shrinking balance sheet = distress; boom growth = earlier risk)"),
              "roa_vol8": ("dyn", "earnings volatility, trailing 8 quarters"),
              "roa_4q": ("dyn", "trailing 4-quarter mean ROA"),
              "n_reports": ("dyn", "length of reporting history (de novo risk)"),
