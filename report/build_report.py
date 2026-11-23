@@ -299,7 +299,9 @@ H("1. Introduction")
 P("The supervision department plans an early-warning system (EWS) that ranks banks by failure risk. Its value depends "
   "first on the data pipeline: if the data are incomplete, mis-typed or contain information from the future, no model "
   "on top of them can be trusted. Because Vietnamese supervisory data are not public, the pipeline is built and tested "
-  "on the US FDIC data, which cover three crises (1984–1993, 2008–2014, 2023). The report answers three questions:")
+  "on the US FDIC data, which cover three crises: the banking and savings-and-loan crisis of the 1980s and early 1990s, "
+  "in which the FDIC and the RTC resolved 1,617 banks and 1,295 thrifts between 1980 and 1994 (FDIC, 1998), the "
+  "2008–2014 wave and the 2023 failures. The report answers three questions:")
 B(["**Q1** – How should four decades of bank reports be stored and processed on a laptop, and when would a Spark cluster be needed? (Sections 2 and 4)",
    "**Q2** – What quality problems do the raw data contain, and how does the pipeline handle them without look-ahead bias? (Sections 3 and 5)",
    "**Q3** – Can the pipeline's output support an honestly validated early-warning model? (Section 6)"])
@@ -323,12 +325,13 @@ P(f"**Completeness check.** For all 170 quarters the number of rows received equ
   f"in 2026 (Figure A1 in the appendix), the expected consolidation trend; no quarter shows a gap or spike that would "
   f"indicate a partial download.")
 P("**Field choice.** The starter's 30 Call Report fields were extended to 45 (plus CERT, REPDTE and NAME), chosen from the "
-  "FDIC dictionary to cover every CAMELS dimension: capital (EQ, leverage and risk-based ratios), asset quality "
+  "FDIC dictionary to cover every dimension of the supervisory CAMELS rating (FDIC, 1997): capital (EQ, leverage and risk-based ratios), asset quality "
   "(non-current, past-due and non-accrual assets, ORE, charge-offs, provisions), earnings (net income, interest income "
   "and expense, non-interest items, dividends), liquidity and funding (cash, securities, core and brokered deposits, "
   "volatile liabilities, FHLB borrowings) and loan concentration (construction, multifamily, non-farm non-residential, "
-  "1–4 family, C&I, consumer, agricultural loans). Commercial real-estate concentration was the main driver of the "
-  "2008–2012 failures, so the real-estate breakdown is essential. BKCLASS, SPECGRP and STNAME are taken from Financials "
+  "1–4 family, C&I, consumer, agricultural loans). Cole and White (2012) find that proxies for commercial real-estate "
+  "investment, together with traditional CAMELS proxies, explain the US bank failures of 2009, so the real-estate "
+  "breakdown of the loan book is essential. BKCLASS, SPECGRP and STNAME are taken from Financials "
   "because there they are recorded per quarter (point-in-time), unlike in Institutions.")
 
 H("2.2 Storage layout", 2)
@@ -404,7 +407,8 @@ B([
     "**Label:** y(i,q) = 1 if bank i fails in (q, q+4]: fail_qi > qi and fail_qi ≤ qi + 4, where fail_qi is the quarter "
     "containing FAILDATE. Rows dated on or after FAILDATE are removed (the event is public by then).",
     "**Failure vs. other exits:** failure if and only if the CERT has a RESTYPE = FAILURE event. Open-bank assistance is not "
-    "a failure: the charter survives and 176 of the 411 assisted banks keep reporting afterwards. All other exits (mergers, "
+    "a failure: in the FDIC's classification of resolution transactions the assisted institution's charter survives "
+    "(FDIC field dictionary, RESTYPE1, which refers to FDIC, 1998) and 176 of the 411 assisted banks keep reporting afterwards. All other exits (mergers, "
     "voluntary liquidations, charter conversions) keep label 0 in all their rows and simply leave the panel after their last "
     "report; they are not dropped, which would create survivorship bias, and not labelled as failures, which would teach the "
     "model that healthy acquisition targets are risky.",
@@ -512,7 +516,9 @@ P("For a quarterly bank-level EWS – the FDIC case and even more so Vietnam's r
 
 # ================================================================== 5 FEATURES
 H("5. Feature pipeline (Part 4)")
-P("Features follow the CAMELS framework used by supervisors, plus dynamics and context. Table 5 groups them; "
+P("Features follow the six components of the CAMELS rating used by US supervisors – capital adequacy, asset quality, "
+  "management, earnings, liquidity and sensitivity to market risk (FDIC, 1997) – whose accounting proxies explain "
+  "bank failures well (Cole & White, 2012), plus dynamics and context. Table 5 groups them; "
   "the full dictionary with rationale, missing share and medians for failing and other banks is Table 12 in the appendix.")
 grp = fdict.groupby("group").feature.apply(lambda s: ", ".join(s)).reset_index()
 gname = {"C": "Capital", "A": "Asset quality", "M": "Management / efficiency", "E": "Earnings", "L": "Liquidity / funding",
@@ -571,7 +577,8 @@ P("Inside the development period, model selection uses **expanding-window walk-f
 T(cvf, "Walk-forward folds inside the development period (chosen model).", widths=[7.4, 2.0, 2.2, 2.6, 2.6], size=8)
 P(f"**Metrics.** With {panel['positive_rate_pct']:.2f}% positives, accuracy is meaningless (predicting ‘no failure’ "
   f"everywhere scores {pct(all_neg_acc, 1)} on the test period). The primary metric is PR-AUC (average precision), which "
-  f"focuses on the rare class; ROC-AUC, recall and precision among the top 1% and 5% of bank-quarters (what a supervisor "
+  f"focuses on the rare class: on imbalanced data the visual reading of ROC curves can be deceptive, whereas "
+  f"precision-recall curves give an accurate picture of future classification performance (Saito & Rehmsmeier, 2015); ROC-AUC, recall and precision among the top 1% and 5% of bank-quarters (what a supervisor "
   f"with limited examination capacity would review) and the Brier score (calibration) complete the picture.")
 H("6.2 Models and development results", 2)
 cm = cvm.loc[["baseline_logit_5", "logit_all", "hgb"]].copy()
@@ -705,16 +712,34 @@ B(["**Scale and tools:** about 50 banks reporting to the State Bank of Vietnam (
    "control and must store every report vintage, which the SBV can do and the public FDIC API cannot."])
 
 # ================================================================== REFERENCES
-H("References and tools")
-B(["FDIC BankFind Suite API and field dictionaries, https://api.fdic.gov/banks/docs/ (accessed November 2026).",
-   "BFT65B course materials: exam paper and starter script fdic_download_starter.py (adapted in src/01_download.py).",
-   "FDIC (1998). Managing the Crisis: The FDIC and RTC Experience 1980–1994.",
-   "Cole, R. A. & White, L. J. (2012). Déjà Vu All Over Again: The Causes of U.S. Commercial Bank Failures This Time Around. "
-   "Journal of Financial Services Research 42, 5–29.",
-   "Polars (v1.44), pandas (v3.1), PyArrow, PySpark (v4.3), scikit-learn (v1.9) documentation.",
-   "AI assistance: Claude (Anthropic) via Claude Code was used to help write and debug the pipeline code, the report "
-   "generator and to draft text. The author reviewed and is responsible for all design choices, code, results and text."],
-  style="List Number")
+H("References")
+B(["Cole, R. A. & White, L. J. (2012). Déjà Vu All Over Again: The Causes of U.S. Commercial Bank Failures This Time "
+   "Around. Journal of Financial Services Research, 42(1), 5–29. https://doi.org/10.1007/s10693-011-0116-9",
+   "FDIC (1997). Uniform Financial Institutions Rating System, policy statement. Federal Register, 62(3), 752–757, "
+   "6 January 1997 (FR Doc. 97-155).",
+   "FDIC (1998). Managing the Crisis: The FDIC and RTC Experience, 1980–1994. Federal Deposit Insurance Corporation. "
+   "https://www.fdic.gov/resources/publications/managing-the-crisis",
+   "FDIC. BankFind Suite API and field dictionaries (risview, failure and institution properties). "
+   "https://api.fdic.gov/banks/docs/ (data downloaded 6 November 2026; dictionaries copied to docs/fdic_dictionary/).",
+   "Saito, T. & Rehmsmeier, M. (2015). The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating "
+   "Binary Classifiers on Imbalanced Datasets. PLoS ONE, 10(3), e0118432. https://doi.org/10.1371/journal.pone.0118432",
+   "BFT65B course materials: exam paper and the starter script fdic_download_starter.py, adapted in src/01_download.py.",
+   "Software: Polars 1.44, pandas 3.1, PyArrow 26, PySpark 4.3, scikit-learn 1.9, matplotlib 3.11, python-docx 1.2 "
+   "(exact versions in requirements.txt)."], style="List Number")
+H("Use of AI tools", 2)
+P("Claude (Anthropic; model Claude Opus 5.5), used through the Claude Code coding agent, was used extensively and is "
+  "declared here in full:")
+B(["**Code:** it wrote almost all of the code in the repository (src/, notebooks/make_spark_notebook.py, run_all.py) "
+   "from the exam requirements, ran the pipeline, diagnosed and fixed errors (e.g. the Windows-on-ARM Polars probe, "
+   "Spark on Windows without Hadoop binaries) and wrote the README.",
+   "**Design proposals:** it proposed the field list, the storage layout, the data-quality checks, the features, the "
+   "development/test split, the models and the two cost assumptions of Section 6.3.",
+   "**Report:** the text, tables and figures of this report were drafted by the AI and are generated by "
+   "report/build_report.py, which inserts every number directly from the pipeline outputs in results/.",
+   "**Sources:** the references above were suggested by the AI and checked against their published abstracts or "
+   "official pages before being cited; each is cited only for the claims it supports.",
+   "**Author's role:** the author set the task from the exam brief, approved the design and the cost assumptions, "
+   "reviewed the code, results and report, and is responsible for the submitted work."])
 
 # ================================================================== APPENDIX
 page_break()
