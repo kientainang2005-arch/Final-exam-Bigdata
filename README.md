@@ -28,7 +28,7 @@ Data files are **not** committed (`data_raw/`, `data/` are git-ignored); they ar
 
 ## How to reproduce
 
-Tested on Windows 11, Python 3.13, 16 GB RAM, 8 cores. Measured runtime of `run_all.py`: ≈ 25 min for the download, then ≈ 25 min for all other steps
+Tested on Windows 11, Python 3.13, 16 GB RAM, 8 cores. Measured runtime of `run_all.py`: ≈ 18 min for the download, then ≈ 25 min for all other steps
 (storage benchmark 4.5 min, engine benchmark 3 min, modelling 8 min, Spark notebook ≈ 6 min).
 
 ```bash

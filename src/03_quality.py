@@ -12,6 +12,7 @@ Every check returns numbers, so the report is evidence, not opinion.
 from __future__ import annotations
 
 import common  # noqa: F401  (sets env before polars is imported)
+from transforms import NONNEG_STOCKS
 
 import json
 import sys
@@ -114,18 +115,18 @@ def check_missing() -> None:
     p("![](figures/dq_missing_by_era.png)")
     structural = show[(show["1984-89"] > 0.5) & (show["2010-19"] < 0.05)].index.tolist()
     issue("Structural missingness", f"fields not collected in early years: {', '.join(structural)}",
-          len(structural), "never imputed with future info: missing-indicator + training-block median; "
-                           "columns empty in a training block are dropped for that block")
+          len(structural), "never imputed with future info: logistic models use missing-indicators + "
+                           "training-block median, HGB handles NaN natively; columns empty in a training block are dropped")
 
 
 # ------------------------------------------------------------------ 4. domain / range
 def check_domain() -> None:
     h("4. Domain and range violations")
-    nonneg = ["ASSET", "DEP", "DEPDOM", "CHBAL", "SC", "LNLSGR", "LNLSNET", "LNRE", "LNCI", "LNCON",
-              "LNATRES", "NCLNLS", "P3ASSET", "P9ASSET", "NAASSET", "ORE", "BRO", "INTINC"]
-    rules = {f"{c} < 0": pl.col(c) < 0 for c in nonneg}
+    # exactly the stock fields that the pipeline nulls when negative (src/transforms.py)
+    rules = {f"{c} < 0": pl.col(c) < 0 for c in NONNEG_STOCKS}
     rules.update({
-        "ASSET == 0": pl.col("ASSET") == 0,
+        "INTINC negative (flow, kept)": pl.col("INTINC") < 0,
+        "ASSET <= 0 or null (row dropped)": (pl.col("ASSET") <= 0) | pl.col("ASSET").is_null(),
         "EQ < 0 (balance-sheet insolvent)": pl.col("EQ") < 0,
         "|ROA| > 100 %": pl.col("ROA").abs() > 100,
         "EQV > 100 % or < -100 %": pl.col("EQV").abs() > 100,
@@ -138,8 +139,8 @@ def check_domain() -> None:
     out = out[out.rows > 0].sort_values("rows", ascending=False)
     table(out, "domain_violations")
     neg = int(out[out.rule.str.contains("< 0") & ~out.rule.str.startswith("EQ")].rows.sum())
-    issue("Negative stock amounts", "negative values in fields that cannot be negative", neg,
-          "set to null (treated as a reporting error)")
+    issue("Negative stock amounts", "negative values in stock fields that cannot be negative", neg,
+          "set to null (treated as a reporting error); negative interest income (a flow) is kept")
     issue("Extreme ratios", "ratios far outside economic range (tiny denominators)",
           int(out[out.rule.str.contains("%")].rows.sum()),
           "ratios recomputed from amounts with safe division; winsorised at train-period 0.5/99.5 pct")
@@ -180,7 +181,7 @@ def check_identities() -> None:
     out["% rows"] = 100 * out.rows / n
     table(out, "identities", floatfmt=".3f")
     issue("Accounting identities", "small share of rows break balance-sheet identities",
-          int(out.rows.sum()), "rows kept: DEP > ASSET coincides with negative equity (insolvency), the rest is <0.05% of rows; ratios use safe division and winsorising")
+          int(out.rows.sum()), "rows kept: DEP > ASSET (0.37%) implies negative equity (insolvency); NAASSET > NCLNLS + ORE (0.35%) is not used by any feature; the other identities fail in < 0.05% of rows; ratios use safe division and winsorising")
 
 
 # ------------------------------------------------------------------ 6. YTD flows

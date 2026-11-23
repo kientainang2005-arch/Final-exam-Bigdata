@@ -227,6 +227,7 @@ def page_break():
 
 
 # ------------------------------------------------------------------ derived numbers
+n_neg_nulled = int(dq.loc[dq.check == "Negative stock amounts", "rows/banks affected"].iloc[0])
 n_dq_problems = int((dq["rows/banks affected"].astype(str) != "0").sum())
 fails_dev_events = by_year[(by_year.year >= int(dev_s[:4])) & (by_year.year <= int(dev_e[:4]))].failures.sum()
 st_csv = storage.iloc[0]
@@ -271,10 +272,10 @@ first = pd.DataFrame([
     ["Clean panel", f"{f0(panel['panel_rows'])} bank-quarters; {f0(panel['labelled_rows_upto_2025Q2'])} labelled rows up to "
                     f"2025Q2 with {f0(panel['positive_rows_upto_2025Q2'])} positives ({panel['positive_rate_pct']:.2f}%)"],
     ["Development period", f"{q(dev_s)}–{q(dev_e)}: {f0(dev_rows)} bank-quarters, {f0(dev_pos)} positive rows, "
-                           f"{f0(dev_banks)} failing banks"],
+                           f"{f0(dev_banks)} failing banks (with ≥ 1 positive row)"],
     ["Gap (unused)", f"{q(str(pd.Timestamp(dev_e) + pd.offsets.QuarterEnd(1))[:10])}–2007Q4 (4 quarters, {f0(split['gap_rows_unused'])} rows)"],
     ["Test period (used once)", f"{q(te_s)}–{q(te_e)}: {f0(te_rows)} bank-quarters, {f0(te_pos)} positive rows, "
-                                f"{f0(te_banks)} failing banks"],
+                                f"{f0(te_banks)} failing banks (with ≥ 1 positive row)"],
 ])
 first.columns = ["Item", "Value"]
 T(first, "Key facts required on the first page.", widths=[4.2, 12.8], size=9)
@@ -291,8 +292,9 @@ P(f"This report builds a reproducible early-warning data pipeline on four decade
   f"Forty point-in-time features pass an automatic truncation test (identical values when future data are removed). "
   f"A gradient-boosting model selected by walk-forward validation on {q(dev_s)}–{q(dev_e)} reaches a test ROC-AUC of "
   f"{test.loc[chosen, 'roc_auc']:.3f} and PR-AUC of {test.loc[chosen, 'pr_auc']:.3f} on {q(te_s)}–{q(te_e)}; at the "
-  f"cost-based threshold it flags {ew['flagged_at_least_once']} of {ew['failed_banks_in_test']} failing banks, with a "
-  f"median lead of {ew['median_lead_quarters']:.0f} quarters.")
+  f"cost-based threshold it flags {ew['flagged_at_least_once']} of the {ew['failed_banks_in_test']} banks that fail within "
+  f"four quarters of a test-period quarter at least once before they fail, more than half of them in the earliest "
+  f"possible quarter, four quarters ahead.")
 page_break()
 
 # ================================================================== 1 INTRODUCTION
@@ -301,7 +303,7 @@ P("The supervision department plans an early-warning system (EWS) that ranks ban
   "first on the data pipeline: if the data are incomplete, mis-typed or contain information from the future, no model "
   "on top of them can be trusted. Because Vietnamese supervisory data are not public, the pipeline is built and tested "
   "on the US FDIC data, which cover three crises: the banking and savings-and-loan crisis of the 1980s and early 1990s, "
-  "in which the FDIC and the RTC resolved 1,617 banks and 1,295 thrifts between 1980 and 1994 (FDIC, 1998), the "
+  "in which 1,617 banks and 1,295 thrifts had to be resolved between 1980 and 1994 (FDIC, 1998), the "
   "2008–2014 wave and the 2023 failures. The report answers three questions:")
 B(["**Q1** – How should four decades of bank reports be stored and processed on a laptop, and when would a Spark cluster be needed? (Sections 2 and 4)",
    "**Q2** – What quality problems do the raw data contain, and how does the pipeline handle them without look-ahead bias? (Sections 3 and 5)",
@@ -319,18 +321,21 @@ P("src/01_download.py (adapted from the course starter) pages through the /finan
   "(temporary file, then rename), so an interrupted run never leaves a half-written file. A JSON manifest records, "
   "per quarter, the rows received, the API's own total, a timestamp and a completeness flag; re-running the script skips "
   "quarters that are already complete, which makes the download **resumable**. Failures and Institutions are small and "
-  "are fetched in full. The full download took about 25 minutes.")
+  "are fetched in full. The full download took about 18 minutes (manifest timestamps 03:01–03:19 UTC).")
 P(f"**Completeness check.** For all 170 quarters the number of rows received equals the API total; the sum is "
   f"{f0(raw_rows)} rows, there are 0 duplicate (CERT, REPDTE) keys and 0 incomplete quarters (Table 11 in the appendix "
   f"and results/dq_rows_per_quarter.csv). The number of reporting banks falls from about 18,000 in 1985 to about 4,300 "
   f"in 2026 (Figure A1 in the appendix), the expected consolidation trend; no quarter shows a gap or spike that would "
   f"indicate a partial download.")
-P("**Field choice.** The starter's 30 Call Report fields were extended to 45 (plus CERT, REPDTE and NAME), chosen from the "
-  "FDIC dictionary to cover every dimension of the supervisory CAMELS rating (FDIC, 1997): capital (EQ, leverage and risk-based ratios), asset quality "
-  "(non-current, past-due and non-accrual assets, ORE, charge-offs, provisions), earnings (net income, interest income "
-  "and expense, non-interest items, dividends), liquidity and funding (cash, securities, core and brokered deposits, "
-  "volatile liabilities, FHLB borrowings) and loan concentration (construction, multifamily, non-farm non-residential, "
-  "1–4 family, C&I, consumer, agricultural loans). Cole and White (2012) find that proxies for commercial real-estate "
+P("**Field choice.** The starter's 30 Call Report fields (plus CERT, REPDTE and STNAME) were extended to 42 Call Report "
+  "fields, four quarter-specific descriptors (NAME, STNAME, BKCLASS, SPECGRP) and the two keys – 48 columns. They were "
+  "chosen from the FDIC dictionary to cover the six components of the supervisory CAMELS rating (FDIC, 1997) as far as "
+  "Call Report data allow: capital (EQ, leverage and risk-based ratios), asset quality (non-current, past-due and "
+  "non-accrual assets, ORE, charge-offs, provisions), management (proxied by non-interest expense relative to income), "
+  "earnings (net income, interest income and expense, non-interest items, dividends), liquidity and funding (cash, "
+  "securities, core and brokered deposits, volatile liabilities, FHLB borrowings) and sensitivity (interest expense and "
+  "loan concentration: construction, multifamily, non-farm non-residential, 1–4 family, C&I, consumer, agricultural "
+  "loans). Cole and White (2012) find that proxies for commercial real-estate "
   "investment, together with traditional CAMELS proxies, explain the US bank failures of 2009, so the real-estate "
   "breakdown of the loan book is essential. BKCLASS, SPECGRP and STNAME are taken from Financials "
   "because there they are recorded per quarter (point-in-time), unlike in Institutions.")
@@ -354,18 +359,22 @@ sb["size_vs_csv"] = sb.size_vs_csv.map(lambda v: f"{v:.2f}")
 for c in ("write_s", "read_all_s", "read_5cols_s", "filter_2008_2010_s"):
     sb[c] = sb[c].map(lambda v: "–" if pd.isna(v) else f"{v:.3f}")
 sb.columns = ["Layout", "Size (MB)", "Write (s)", "Read all (s)", "Read 5 cols (s)", "Filter 2008–10, 5 cols (s)", "Size / CSV"]
-T(sb, "Storage benchmark on the full panel (1.68 M rows × 49 columns). One warm-up then median of 5 runs; Polars reader unless stated.",
+T(sb, "Storage benchmark on the curated Financials table (1,682,616 rows × 49 columns). One warm-up then median of 5 runs (pandas baseline: median of 3); Polars reader unless stated.",
   widths=[5.0, 1.8, 1.7, 1.9, 2.0, 2.6, 1.7])
 P(f"Parquet with zstd is {pct(1 - st_zstd.size_vs_csv, 0)} smaller than CSV and the partitioned layout "
   f"{pct(1 - st_part.size_vs_csv, 0)} smaller. Reading everything is {st_csv.read_all_s / st_part.read_all_s:.0f}× "
   f"faster, because CSV must be parsed and its types inferred, whereas Parquet is already typed and compressed in "
   f"column chunks. The gain is largest when the query needs only a few columns ({st_csv.read_5cols_s / st_part.read_5cols_s:.0f}× "
   f"faster) or a time slice ({st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× faster), the typical "
-  f"supervisory access pattern: CSV has no column projection or statistics, so every query scans all 519 MB. gzip "
+  f"supervisory access pattern: CSV has no column projection or statistics, so every query scans all 519 MB. These ratios use the "
+  f"Polars CSV reader; pandas reads the five CSV columns in {storage.iloc[-1].read_5cols_s:.1f} s, so the Parquet read is still "
+  f"{storage.iloc[-1].read_5cols_s / st_part.read_5cols_s:.0f}× faster than the pandas baseline. gzip "
   f"makes CSV small but is the slowest to write and still has to be fully decompressed and parsed. The partitioned "
   f"layout costs slightly more space than a single zstd file (per-file overhead) and is slightly slower for full scans, "
-  f"but it is the fastest for time filters and allows new quarters to be appended by rewriting one small partition "
-  f"instead of the whole file – the decisive operational advantage for a quarterly-updated EWS.")
+  f"and all Parquet layouts answer the REPDTE filter in about 0.01 s, because row-group min/max statistics already skip "
+  f"most data – this benchmark therefore does not isolate partition pruning. The partitioned layout's advantages are "
+  f"that a filter on year skips whole files and that a new quarter is appended by rewriting one small partition instead "
+  f"of the whole file – the decisive operational advantage for a quarterly-updated EWS.")
 
 # ================================================================== 3 QUALITY & PANEL
 H("3. Data quality and the bank-quarter panel (Part 2)")
@@ -382,9 +391,10 @@ B([
     "them). A model would read 0% capital as insolvency. The ratios are therefore not used; equity/assets, which exists in all "
     "eras, measures capital instead.",
     "**Structural missingness.** Some items were introduced late: 30–89-day past-due assets are missing for 100% of rows before "
-    "2000, FHLB borrowings for 82–87% before 2000 (Figure A2). They are kept with a missing-indicator and a training-period "
-    "median, never imputed from later data.",
-    "**Impossible values.** 860 negative values in stock amounts that cannot be negative (mostly ORE) are set to null; 15,659 "
+    "2000, FHLB borrowings for 82–87% before 2000 (Figure A2). They are kept: the logistic models add a missing-indicator "
+    "and impute the training-block median, HGB handles missing values natively, and nothing is imputed from later data.",
+    f"**Impossible values.** {n_neg_nulled:,} negative values in stock amounts that cannot be negative (85% of them in ORE, "
+    "non-farm non-residential and multifamily real-estate loans) are set to null; 15,659 "
     "rows with negative equity are kept because they are genuine and highly informative; 18,077 risk-based ratios above 100% "
     "come from banks with almost no risk-weighted assets. Ratios are recomputed from amounts with safe division and "
     "winsorised with training-period quantiles.",
@@ -394,21 +404,22 @@ B([
     "institution kept filing after FAILDATE – 226 of them savings institutions placed in RTC conservatorship in 1989, "
     "where FAILDATE is the takeover date.",
     "**Structure codes are not a failure flag.** Code 211 is 99.3% failures, but only 83.6% of failed banks carry it; the others "
-    "carry merger-type codes (213, 217, 235) that also occur for healthy mergers. Using CHANGEC would mislabel about one failure "
-    "in six as a merger.",
+    "carry code 230 (also mostly failures) or the merger-type codes 213, 217 and 235, which also occur for healthy mergers. "
+    "Treating code 211 as the failure flag would therefore miss about one failure in six.",
     "**Point-in-time traps.** 4,518 banks (18.8%) changed charter class over time and 249 changed state, but Institutions "
     "stores only the latest values; ACTIVE, ENDEFYMD and CHANGEC describe the end of a bank's life. Joining them to old "
     "quarters would leak the future, so Institutions is used only to analyse exits, never for features.",
 ])
 H("3.2 Panel construction and exits", 2)
-P("src/04_panel.py (logic in src/transforms.py) builds the panel in one lazy Polars query: drop rows with zero assets "
-  "(1,211 rows that cannot form ratios), null impossible negatives, add a quarter index qi = 4·year + quarter − 1, "
-  "de-cumulate the flows, attach the first FAILURE date per CERT and derive the label and exit type.")
+P("src/04_panel.py (logic in src/transforms.py) builds the panel in one lazy Polars query: keep rows with positive assets "
+  f"(a guard for the ratios; every row in this download qualifies), null the {n_neg_nulled:,} impossible negative values, "
+  "add a quarter index qi = 4·year + quarter − 1, de-cumulate the flows, attach the first FAILURE date per CERT and "
+  "derive the label and exit type.")
 B([
     "**Label:** y(i,q) = 1 if bank i fails in (q, q+4]: fail_qi > qi and fail_qi ≤ qi + 4, where fail_qi is the quarter "
-    "containing FAILDATE. Rows dated on or after FAILDATE are removed (the event is public by then).",
+    "containing FAILDATE. Rows dated on or after FAILDATE are removed – 1,211 rows, the only rows dropped – because the event is public by then.",
     "**Failure vs. other exits:** failure if and only if the CERT has a RESTYPE = FAILURE event. Open-bank assistance is not "
-    "a failure: in the FDIC's classification of resolution transactions the assisted institution's charter survives "
+    "a failure: in the FDIC's classification of resolution transactions, in most assistance transactions the institution's charter survives "
     "(FDIC field dictionary, RESTYPE1, which refers to FDIC, 1998) and 176 of the 411 assisted banks keep reporting afterwards. All other exits (mergers, "
     "voluntary liquidations, charter conversions) keep label 0 in all their rows and simply leave the panel after their last "
     "report; they are not dropped, which would create survivorship bias, and not labelled as failures, which would teach the "
@@ -417,12 +428,14 @@ B([
 ])
 ex = panel["exit_types"]
 P(f"The panel has {f0(panel['panel_rows'])} bank-quarters for {f0(panel['banks'])} banks: {f0(ex['failure'])} failed, "
-  f"{f0(ex['other exit (merger/closure)'])} exited otherwise and {f0(ex['active'])} still report in 2026Q2. "
-  f"Of the {panel['failure_events_FAILURE_in_scope']} in-scope failed banks, "
+  f"{f0(ex['other exit (merger/closure)'])} exited otherwise and {f0(ex['active'])} still report in 2026Q2. The panel has two banks fewer than the raw "
+  f"Financials ({f0(n_banks_raw)}): two FSLIC institutions that failed in 1981–82 kept filing under the same CERT until "
+  f"1996–99, and all of their reports are dated after FAILDATE. "
+  f"Of the {f0(panel['failure_events_FAILURE_in_scope'])} in-scope failed banks, "
   f"{panel['failure_events_FAILURE_in_scope'] - ex['failure']} never filed a Call Report; every one of the "
-  f"{f0(ex['failure'])} failed banks in the panel has positive rows, and {panel['failed_banks_with_a_positive_label_row']} "
+  f"{f0(ex['failure'])} failed banks in the panel has positive rows, and {f0(panel['failed_banks_with_a_positive_label_row'])} "
   f"have them inside the modelling window up to 2025Q2 (the other two failed in July 2026). The positive "
-  f"rate is {panel['positive_rate_pct']:.2f}%, i.e. about 1 in 150 bank-quarters (Figure 1).")
+  f"rate is {panel['positive_rate_pct']:.2f}%, i.e. about 1 in 150 bank-quarters; Figure 1 shows the failures per year.")
 FIGURE(FIG / "failures_per_year.png", "Bank failures per year (RESTYPE = FAILURE). Failures cluster in 1984–1993 and 2008–2014.", 14)
 
 # ================================================================== 4 PROCESSING
@@ -435,8 +448,8 @@ B(["**Projection pushdown:** only the columns used downstream are read from Parq
    "the failures scan reads PROJECT 3/16 COLUMNS and the financials scan drops the unused partition column; a query "
    "that selects five columns never decodes the other 44 (‘Read 5 cols’ in Table 2).",
    "**Predicate pushdown:** the filter ASSET > 0 written after the scan appears inside it as SELECTION: col(\"ASSET\") > 0, "
-   "and the RESTYPE = FAILURE filter is pushed into the failures scan; with a REPDTE or year filter, Hive partitions "
-   "outside the range are never opened.",
+   "and the RESTYPE = FAILURE filter is pushed into the failures scan; with a filter on year, Hive partitions outside "
+   "the range are never opened, and with a REPDTE filter the row-group statistics in each file footer skip data.",
    "**Common-subexpression elimination:** the optimised plan contains cached sub-expressions (__POLARS_CSER_…) – the Q1 test "
    "month(REPDTE) == 3 and the expression qi − 1 are computed once and reused by all eight de-cumulated flows.",
    "**Parallel window and join execution:** .over('CERT') is evaluated as a parallel group-by on all cores; lags are "
@@ -457,14 +470,14 @@ bt.columns = ["Engine", "Time, median (s)", "Time, min (s)", "Peak memory (MB)",
 T(bt, f"Same pipeline on {f0(panel['panel_rows'])} output rows. Max |pandas − Polars| over 15 output columns: "
       f"{max(v['max_abs_diff_all'] for v in eq.values()):.0e}; null patterns identical.", widths=[3.6, 3.0, 3.0, 3.2, 2.4])
 pe_t, pe_m = b1.loc["polars-eager", "seconds_median"], b1.loc["polars-eager", "peak_mb_median"]
-P(f"Polars lazy is {pd_t / pl_t:.1f}× faster than pandas and uses {pct(1 - pl_m / pd_m, 0)} less memory. "
+P(f"Polars lazy is {pd_t / pl_t:.1f}× faster than pandas (Table 3) and uses {pct(1 - pl_m / pd_m, 0)} less memory. "
   f"The eager variant shows where the gain comes from. With the same expressions but every intermediate table "
   f"materialised, Polars eager is still {pd_t / pe_t:.1f}× faster than pandas – the vectorised, multi-threaded Rust "
   f"kernels – but it needs the most memory of all engines ({f0(pe_m)} MB, {pe_m / pl_m:.1f}× the lazy run) and is "
   f"{pct(pe_t / pl_t - 1, 0)} slower than lazy. The lazy query optimiser adds the rest: it fuses steps, prunes columns "
   f"and never allocates the intermediate tables, which matters more for memory than for time. Streaming lowers the "
-  f"memory peak further to {f0(st_m)} MB at a small cost in time, because sort-based window operations limit how "
-  f"much of this pipeline can be streamed.")
+  f"memory peak further to {f0(st_m)} MB at a small cost in time; the saving is limited because sort-based window "
+  f"operations restrict how much of this pipeline can be streamed.")
 P("**Scaling.** To see how the engines behave beyond the real data size, the panel was replicated 2, 4 and 8 times "
   "with disjoint CERTs (Figure 2).")
 FIGURE(FIG / "benchmark_scaling.png", "Wall time and peak memory vs. data size (×1, ×2, ×4, ×8 replicas of the panel).", 16.5)
@@ -476,15 +489,17 @@ H("4.3 Reproduction in PySpark", 2)
 P("notebooks/08_spark_demo.ipynb re-implements the key steps in the Spark DataFrame API (local[*], AQE on, 16 shuffle "
   "partitions): cleaning, de-cumulation with lag() over a window partitioned by CERT, the broadcast join with failures, "
   "the label, eight ratio features, the 4-quarter self-join, gap-safe rolling windows (rangeBetween(−7, 0) on the "
-  "quarter index) and state medians. The result is compared with Polars row by row:")
+  "quarter index) and state medians. The result is compared with Polars row by row (Table 4):")
 sc = spark_cmp.copy()
 sc["max_abs_diff"] = sc.max_abs_diff.map(lambda v: f"{v:.1e}")
 sc["sum_polars"] = sc.sum_polars.map(f3); sc["sum_spark"] = sc.sum_spark.map(f3)
 sc.columns = ["Column", "Null mismatches", "Max |diff|", "Sum (Polars)", "Sum (Spark)"]
-T(sc, "Spark vs. Polars on the same 1.68 M rows (sorted by CERT, quarter).", widths=[3.2, 2.6, 2.6, 4.0, 4.0], size=8)
+T(sc, "Spark vs. Polars on the same 1,681,405 panel rows through 2026Q2 (sorted by CERT, quarter); y therefore sums to "
+      "10,871, against 10,860 positives up to 2025Q2.", widths=[3.2, 2.6, 2.6, 4.0, 4.0], size=8)
 P(f"All rows and columns match; the only differences (≤ {max_spark_diff:.0e}) are floating-point summation order in "
-  f"the rolling standard deviation. Spark needed {sp_t.get('spark local[*]', float('nan')):.0f} s for this job against "
-  f"{sp_t.get('polars lazy', float('nan')):.1f} s for Polars on the same laptop.")
+  f"the rolling statistics (roa_vol8, roa_4q). Spark needed {sp_t.get('spark local[*]', float('nan')):.0f} s for this job against "
+  f"{sp_t.get('polars lazy', float('nan')):.1f} s for Polars on the same laptop (a single run inside the notebook, "
+  f"whereas Table 3 reports the median of three runs in fresh processes).")
 P("**Reading the physical plan** (explain('formatted') in the notebook, read bottom-up). (1) Scan parquet: ReadSchema "
   "lists only the 17 of 49 columns the job needs and PushedFilters contains GreaterThan(ASSET, 0) – the same projection "
   "and predicate pushdown as Polars; with a year filter (notebook section 1) the scan also shows PartitionFilters, i.e. "
@@ -496,18 +511,19 @@ P("**Reading the physical plan** (explain('formatted') in the notebook, read bot
   "contains no Window: the optimiser saw that eq_ta, npa_ta and ASSET do not depend on the de-cumulated flows and "
   "pruned that work, but it still reads the data twice. (5) A new Exchange on CERT for the rolling windows – the "
   "(CERT, qi) partitioning of the join does not satisfy a window partitioned by CERT – and (6) an Exchange on "
-  "(STNAME, qi) for the state median. Five shuffles in total: on a cluster each moves data across the network, on one "
+  "(STNAME, qi) for the state median. Five shuffles of the panel in total (plus two small ones: the failures table is aggregated twice, once for the label and once again on the right-hand side of the self-join): on a cluster each moves data across the network, on one "
   "machine it is pure serialisation overhead, which is why Spark is slower than Polars here. Spark is also lazy: "
   "without cache() every action re-executes the whole lineage from the scan, so the MLlib part caches the feature "
   "table first (35 s once, instead of once per pass of every estimator).")
 H("4.4 When would a cluster be justified?", 2)
-P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {pl_m / 1024:.1f} GB in memory during "
-  f"the whole transformation pipeline, which takes {pl_t:.1f} s. From the scaling experiment the lazy engine needs roughly "
+P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {pl_m / 1024:.1f} GB in memory for "
+  f"the benchmarked core pipeline (Table 3), which takes {pl_t:.1f} s; building the full 40-feature table and writing it "
+  f"takes {feats['seconds']:.0f} s. From the scaling experiment the lazy engine needs roughly "
   f"{x8l_mem * 2**20 / x8_rows:,.0f} bytes per output row, so with 70% of 16 GB usable a single laptop can process about "
   f"{rows_fit_16gb / 1e6:,.0f} M bank-quarter rows in memory – about {rows_fit_16gb / panel['panel_rows']:.0f} times the "
   f"FDIC panel – and the streaming engine and out-of-core sinks push this further. On this data Spark is "
-  f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower because of JVM start-up, task "
-  f"scheduling and shuffle overhead. A cluster is justified only when one of these conditions holds:")
+  f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower because of task scheduling, serialisation "
+  f"and shuffle overhead (JVM start-up is not included in the measured time). A cluster is justified only when one of these conditions holds:")
 B(["the working set exceeds one machine's memory even with streaming – e.g. loan-level credit-registry data "
    "(hundreds of millions of loan-months) or transaction data, not quarterly bank aggregates;",
    "the job must finish within a fixed window that one machine cannot meet (e.g. daily stress tests over many scenarios);",
@@ -534,15 +550,16 @@ T(grp[["group", "feature"]].rename(columns={"group": "Group", "feature": "Featur
   widths=[4.2, 12.8], size=8)
 _m = fdict.set_index("feature")
 _f = lambda k, c: _m.loc[k, c]
-P(f"Examples of the separation in the data (medians, failing vs. other bank-quarters): equity/assets "
+P(f"Examples of the separation in the development period 1986Q1–2006Q4 (medians, failing vs. other bank-quarters; "
+  f"the test period is not used for these statistics): equity/assets "
   f"{pct(_f('eq_ta', 'median_failing (y=1)'))} vs {pct(_f('eq_ta', 'median_others (y=0)'))}, Texas ratio "
   f"{_f('texas', 'median_failing (y=1)'):.2f} vs {_f('texas', 'median_others (y=0)'):.2f}, non-performing assets "
   f"{pct(_f('npa_ta', 'median_failing (y=1)'))} vs {pct(_f('npa_ta', 'median_others (y=0)'))} of assets, quarterly ROA "
   f"{pct(_f('roa_q', 'median_failing (y=1)'))} vs {pct(_f('roa_q', 'median_others (y=0)'))}, 4-quarter asset growth "
   f"{pct(_f('g4_asset', 'median_failing (y=1)'), 0)} vs {pct(_f('g4_asset', 'median_others (y=0)'), 0)}. Rapid "
   f"deterioration (4-quarter changes) and stress in the bank's state add information that a single snapshot misses.")
-P("**Point-in-time contract.** A feature for bank i in quarter q may use (a) bank i's reports dated ≤ q, (b) aggregates "
-  "of other banks' reports dated ≤ q (state medians), and (c) failures with FAILDATE ≤ q (public). Lags are self-joins on "
+P("**Point-in-time contract.** A feature for bank i in quarter q may use (a) bank i's reports dated ≤ q, (b) same-quarter "
+  "aggregates of all banks' reports dated ≤ q, including the bank itself (state medians), and (c) failures with FAILDATE ≤ q (public). Lags are self-joins on "
   "(CERT, qi−4); trailing windows are defined on the quarter index; no statistic of the whole sample is computed in the "
   "feature code. Static Institutions attributes and exit fields are never used.")
 pit = feats["pit_test"]
@@ -554,8 +571,9 @@ P(f"**Automatic leakage test.** src/06_features.py recomputes all {feats['n_feat
   f"‘no look-ahead’ from a claim into a tested property.")
 P("**Preprocessing fitted on training data only.** All fitted steps live in an sklearn Pipeline that is re-fitted inside "
   "every training block: DropEmpty (drops columns that are entirely missing in the training block, e.g. past-due assets "
-  "before 2000), Winsorizer (clips each feature to its 0.5%/99.5% training quantiles), SimpleImputer (training median, "
-  "with missing-indicator columns), StandardScaler (logistic models only). Validation and test rows are only transformed.")
+  "before 2000), Winsorizer (clips each feature to its 0.5%/99.5% training quantiles) – both for all models – and, for the "
+  "logistic models only, SimpleImputer (training median, with missing-indicator columns) and StandardScaler; HGB "
+  "handles missing values natively. Validation and test rows are only transformed.")
 
 # ================================================================== 6 MODELLING
 H("6. Modelling and validation (Part 5)")
@@ -565,8 +583,9 @@ P(f"**Development** {q(dev_s)}–{q(dev_e)}, **gap** 2007Q1–Q4, **test** {q(te
   f"ahead to 2007Q4; without it, development labels would overlap the test period. The choice is deliberate: the model "
   f"learns from the savings-and-loan and early-1990s crises and must then recognise a different crisis (2008–2012, "
   f"driven by real-estate lending) and the 2023 failures – a genuine out-of-time and out-of-crisis test with "
-  f"{te_banks} failing banks, far above the minimum of 50. A test period starting later (e.g. 2012) would leave too few "
-  f"failures for stable estimates.")
+  f"{te_banks} failing banks (banks with at least one positive test-period row, i.e. failing between 2008Q2 and 2026Q2), "
+  f"far above the minimum of 50. A later start (e.g. 2012, still more than 100 failures) would exclude the core of the "
+  f"2008–2011 crisis; the chosen split tests the model on a full crisis cycle.")
 cvf = cv[cv.model == chosen][["fold", "n", "positives", "pr_auc", "roc_auc"]].copy()
 cvf["fold"] = cvf.fold.str.replace("train<= ", "train ≤ ")
 for c in ("pr_auc", "roc_auc"):
@@ -596,8 +615,8 @@ P(f"The baseline is the classic supervisory logit on five CAMELS ratios (equity/
   f"capital’ and handles missing values natively; its hyper-parameters were chosen from 8 combinations by mean "
   f"walk-forward PR-AUC (learning rate {hgbp['learning_rate']}, {hgbp['max_leaf_nodes']} leaves, at least "
   f"{hgbp['min_samples_leaf']} rows per leaf, {hgbp['max_iter']} trees). HGB is clearly best on every development metric "
-  f"and was selected; the model, features and threshold were frozen to results/frozen_choices.json before the test "
-  f"period was read. No choice was revisited after the test evaluation; the end-to-end reproducibility run "
+  f"and was selected; the model, features and threshold were frozen to results/frozen_choices.json before any "
+  f"test-period prediction was made (per-fold results for all models: Table 13). No choice was revisited after the test evaluation; the end-to-end reproducibility run "
   f"(run_all.py, log in logs/run_all.log) recomputes the same frozen choices and the identical test metrics "
   f"deterministically.")
 FIGURE(FIG / "model_pr_and_cost.png", "Left: pooled out-of-fold PR curves on the development period (AP of the pooled "
@@ -606,8 +625,8 @@ H("6.3 Alarm threshold from costs", 2)
 _r = costs["ratio_FN_FP"]
 _s = sens.set_index("C_FP multiplier")
 P(f"The threshold minimises expected cost C_FN·FN + C_FP·FP on the pooled out-of-fold development predictions. Both costs "
-  f"are estimated from development-period data. **Missed failure:** the median loss to the deposit insurance fund of the "
-  f"{costs['failures_used']:,} failures in {dev_s[:4]}–{dev_e[:4]} with a recorded COST is "
+  f"are anchored in development-period data. **Missed failure:** the median loss to the deposit insurance fund of the "
+  f"{costs['failures_used']:,} failures dated {q(dev_s)}–{q(dev_e)} with a recorded COST is "
   f"${costs['median_cost_kusd'] / 1e3:.2f} M (median loss rate {pct(costs['median_loss_rate'], 1)} of the failed bank's "
   f"assets); assuming that early supervisory action avoids {pct(costs['avoidable_share'], 0)} of that loss gives "
   f"C_FN = ${costs['C_FN_kusd'] / 1e3:.2f} M. **False alarm:** an unnecessary targeted examination of a healthy bank, "
@@ -640,12 +659,13 @@ tbl = pd.DataFrame({
 T(tbl, f"Test period {q(te_s)}–{q(te_e)} ({f0(te_rows)} bank-quarters, {f0(te_pos)} positives). Each model at its own "
        f"development-chosen cost threshold. Evaluated once.", widths=[4.4, 1.5, 1.5, 1.6, 1.6, 1.8, 1.4, 1.2, 1.6],
   size=8, bold_rows=(2,))
-P(f"The selected HGB model reaches ROC-AUC {test.loc[chosen, 'roc_auc']:.3f} and PR-AUC {test.loc[chosen, 'pr_auc']:.3f}. "
+P(f"The selected HGB model (Table 9) reaches ROC-AUC {test.loc[chosen, 'roc_auc']:.3f} and PR-AUC {test.loc[chosen, 'pr_auc']:.3f}. "
   f"At the frozen threshold it catches {pct(test.loc[chosen, 'recall'], 1)} of positive bank-quarters with "
   f"{pct(test.loc[chosen, 'precision'], 1)} precision and has the lowest expected cost of the three models. From the bank "
-  f"perspective, {ew['flagged_at_least_once']} of the {ew['failed_banks_in_test']} banks that failed in the test period "
-  f"({pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 1)}) were flagged at least once before failing, with a "
-  f"median lead time of {ew['median_lead_quarters']:.0f} quarters (Figure 4). Its accuracy, "
+  f"perspective, {ew['flagged_at_least_once']} of the {ew['failed_banks_in_test']} banks that fail within four quarters of a test-period "
+  f"quarter ({pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 1)}) were flagged at least once before failing. "
+  f"Lead time is measured inside the four-quarter label window, so it is at most four quarters; the median, "
+  f"{ew['median_lead_quarters']:.0f}, means that more than half were flagged in the earliest possible quarter. Its accuracy, "
   f"{pct(test.loc[chosen, 'accuracy'], 1)}, is below the {pct(all_neg_acc, 1)} of the trivial ‘no failure’ rule – an "
   f"illustration of why accuracy was not used.")
 P(f"Two results deserve an honest reading. First, all models score much higher on the test period than in development; "
@@ -655,7 +675,7 @@ P(f"Two results deserve an honest reading. First, all models score much higher o
   f"PR-AUC). HGB's advantage on the test set lies in recall at the chosen operating point – it misses "
   f"{f0(test.loc[chosen, 'fn'])} positive bank-quarters against {f0(test.loc['baseline_logit_5', 'fn'])} for the baseline – at "
   f"the price of more false alarms, which the cost function accepts because a miss is {costs['ratio_FN_FP']:.0f} times "
-  f"as expensive. Alarms track the crisis closely and fall to a few dozen per quarter after 2014.")
+  f"as expensive. Alarms track the crisis closely and fall to a few dozen per quarter after 2014 (Figure 4).")
 FIGURE(FIG / "test_alarms_over_time.png", "Test period: number of alarms vs. banks failing within four quarters, by quarter.", 15.5)
 if mllib is not None:
     m = mllib.iloc[0]
@@ -674,7 +694,7 @@ if mllib is not None:
 H("7. Conclusions (Part 6)")
 P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compressed Parquet layer partitioned by year "
   f"({st_part.size_MB:.0f} MB instead of {st_csv.size_MB:.0f} MB of CSV, {st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× "
-  f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the whole "
+  f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the core "
   f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but is "
   f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower on one machine; a cluster becomes "
   f"necessary only beyond roughly {rows_fit_16gb / 1e6:,.0f} M rows per job, for loan- or transaction-level data, strict "
@@ -682,13 +702,14 @@ P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compre
 P(f"**Q2 – Data quality without look-ahead.** The raw data contain year-to-date flows, zeros that mean ‘not reported’, "
   f"fields introduced decades apart, impossible values, type drift, multiple and non-standard failure events and static "
   f"attributes that describe the end of a bank's life. Each is detected automatically and handled with information "
-  f"available at the time: de-cumulation within the year, null instead of zero, missing indicators and training-period "
-  f"statistics, failures defined only by the Failures table, quarter-specific attributes. The truncation test proves "
+  f"available at the time: de-cumulation within the year, exclusion of zero-coded ratios, missing indicators and "
+  f"training-period statistics, failures defined only by the Failures table, quarter-specific attributes. The truncation test proves "
   f"that no feature changes when future data are removed.")
 P(f"**Q3 – Honest validation.** Yes. With a time-ordered split, a four-quarter gap, walk-forward selection, preprocessing "
   f"fitted inside each training block, a cost-based threshold frozen before testing and a single test evaluation, the "
   f"pipeline's output supports a model that ranks banks well out of sample (test ROC-AUC {test.loc[chosen, 'roc_auc']:.3f}) "
-  f"and warns about {pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 0)} of failures about a year ahead.")
+  f"and flags {pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 0)} of failing banks before failure, "
+  f"most of them a full four quarters ahead.")
 H("Limitations", 2)
 B(["The API serves the latest amended Call Reports, not the vintages available at the time, and reports are published "
    "30–60 days after quarter end; a production EWS would need vintage data and a publication lag in the label window.",
@@ -696,7 +717,7 @@ B(["The API serves the latest amended Call Reports, not the vintages available a
    "a handful of failures per year) is estimated with large uncertainty.",
    "The avoidable share of loss and the examination cost are not observed in the FDIC data; the exact threshold moves "
    "with them (Table 8), although the operating regime does not. A supervisor would replace them with its own "
-   "examination budget. Assisted banks are treated as non-failures (their charter survives), a defensible but debatable "
+   "examination budget. Assisted banks are treated as non-failures (in most cases their charter survives), a defensible but debatable "
    "choice.",
    "Timings come from one laptop running x64 Python under emulation on an ARM CPU; ratios between engines are more "
    "reliable than absolute numbers. The ×2–×8 scaling uses replicated data with the same distribution."])
@@ -709,7 +730,7 @@ B(["**Scale and tools:** about 50 banks reporting to the State Bank of Vietnam (
    "special control or a large capital shortfall) and will be even rarer – US data or a transfer-learning approach could "
    "provide the prior.",
    "**Data definitions:** Vietnamese reports follow VAS and SBV circulars (e.g. Circular 31/2024 on loan classification, "
-   "Circular 41/2016 and 22/2019 on capital and liquidity ratios); every field mapping, unit and year-to-date convention "
+   "Circulars 41/2016 and 22/2019 on capital and liquidity ratios); every field mapping, unit and year-to-date convention "
    "must be audited in the same automated way, and state-owned banks may need separate treatment.",
    "**Point-in-time and governance:** supervisory data are confidential, so the pipeline would run on-premise with access "
    "control and must store every report vintage, which the SBV can do and the public FDIC API cannot."])
@@ -749,6 +770,8 @@ page_break()
 H("Appendix")
 H("A. Data-quality summary (generated by src/03_quality.py)", 2)
 d = dq.copy()
+d["rows/banks affected"] = d["rows/banks affected"].astype(str).map(
+    lambda v: f"{int(v):,}" if v.isdigit() else re.sub(r"^(\d{4,})", lambda m: f"{int(m.group(1)):,}", v))
 d.columns = ["Check", "Finding", "Affected", "Handling in the pipeline"]
 T(d, "All data-quality checks, findings and handling.", widths=[2.8, 5.2, 2.0, 7.0], size=7.5)
 H("B. Completeness by quarter (excerpt)", 2)
@@ -769,7 +792,7 @@ for c in ("median_failing (y=1)", "median_others (y=0)"):
     fd[c] = fd[c].map(lambda v: "" if pd.isna(v) else ("0" if abs(v) < 5e-5 else f"{v:.4g}"))
 fd["missing_pct"] = fd.missing_pct.map(lambda v: f"{v:.1f}")
 fd.columns = ["Feature", "Group", "Rationale", "Missing %", "Median, y=1", "Median, y=0"]
-T(fd, "Feature dictionary (labelled rows up to 2025Q2).", widths=[2.6, 1.2, 7.2, 1.6, 2.0, 2.0], size=7.5)
+T(fd, "Feature dictionary; missing share and medians computed on the development period 1986Q1–2006Q4 only.", widths=[2.6, 1.2, 7.2, 1.6, 2.0, 2.0], size=7.5)
 H("D. Walk-forward results for all models and folds", 2)
 cva = cv[["model", "fold", "positives", "pr_auc", "roc_auc", "recall_top5pct"]].copy()
 cva["model"] = cva.model.map(names)

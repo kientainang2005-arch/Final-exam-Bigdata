@@ -75,7 +75,8 @@ def main() -> None:
              "npa_vs_state": ("ctx", "bank NPA relative to state median"),
              "fails_trailing4q_us": ("ctx", "US failures in the past 4 quarters (public)")}
     rows = []
-    lab = feat.filter(pl.col("REPDTE") <= pl.date(2025, 6, 30))
+    # descriptive statistics on the DEVELOPMENT period only, so the test period never informs feature design
+    lab = feat.filter(pl.col("REPDTE").is_between(pl.date(1986, 3, 31), pl.date(2006, 12, 31)))
     pos, neg = lab.filter(pl.col("y") == 1), lab.filter(pl.col("y") == 0)
     for f in FEATURES:
         g, r = groups.get(f), why.get(f)
