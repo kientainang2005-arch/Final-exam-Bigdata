@@ -1,5 +1,5 @@
 """
-Builds report/BFT65B_Final_Report_NguyenTrungKien.docx from the files in results/.
+Builds report/BFT65B_Final_Report_NguyenTrungKien_11230982.docx from the files in results/.
 Every number in the report is read from the pipeline outputs, so the report always matches the last run.
 
     python report/build_report.py
@@ -22,7 +22,7 @@ from docx.shared import Cm, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[1]
 R = ROOT / "results"
 FIG = R / "figures"
-OUT = ROOT / "report" / "BFT65B_Final_Report_NguyenTrungKien.docx"
+OUT = ROOT / "report" / "BFT65B_Final_Report_NguyenTrungKien_11230982.docx"
 
 AUTHOR, SID = "Nguyễn Trung Kiên", "11230982"
 GITHUB = "https://github.com/kientainang2005-arch/Final-exam-Bigdata"
