@@ -227,6 +227,7 @@ def page_break():
 
 
 # ------------------------------------------------------------------ derived numbers
+n_dq_problems = int((dq["rows/banks affected"].astype(str) != "0").sum())
 fails_dev_events = by_year[(by_year.year >= int(dev_s[:4])) & (by_year.year <= int(dev_e[:4]))].failures.sum()
 st_csv = storage.iloc[0]
 st_part = storage[storage.layout.str.contains("partitioned")].iloc[0]
@@ -282,10 +283,10 @@ P("Abstract", bold_prefix=None).runs[0].bold = True
 P(f"This report builds a reproducible early-warning data pipeline on four decades of US Call Reports. The data are "
   f"downloaded with a resumable, self-verifying procedure and stored as a typed, zstd-compressed Parquet layer "
   f"partitioned by year, which is {pct(1 - st_part.size_vs_csv, 0)} smaller than CSV and reads a three-year slice "
-  f"{st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:,.0f} times faster. An automated audit finds and handles "
-  f"{len(dq)} classes of data problems, among them year-to-date income flows, zeros that mean ‘not reported’, schema "
+  f"{st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:,.0f} times faster. An automated audit of "
+  f"{len(dq)} checks finds and handles {n_dq_problems} classes of data problems, among them year-to-date income flows, zeros that mean ‘not reported’, schema "
   f"drift, failures that cannot be identified from structure codes and static attributes that leak the future. The core "
-  f"transformations run in Polars' lazy engine in {pl_t:.1f} s, {pd_t / pl_t:.0f}× faster than an identical pandas "
+  f"transformations run in Polars' lazy engine in {pl_t:.1f} s, {pd_t / pl_t:.1f}× faster than an identical pandas "
   f"pipeline with {pct(1 - pl_m / pd_m, 0)} less memory; PySpark reproduces them to within {max_spark_diff:.0e}. "
   f"Forty point-in-time features pass an automatic truncation test (identical values when future data are removed). "
   f"A gradient-boosting model selected by walk-forward validation on {q(dev_s)}–{q(dev_e)} reaches a test ROC-AUC of "
@@ -417,8 +418,10 @@ B([
 ex = panel["exit_types"]
 P(f"The panel has {f0(panel['panel_rows'])} bank-quarters for {f0(panel['banks'])} banks: {f0(ex['failure'])} failed, "
   f"{f0(ex['other exit (merger/closure)'])} exited otherwise and {f0(ex['active'])} still report in 2026Q2. "
-  f"{panel['failed_banks_with_a_positive_label_row']} of the {panel['failure_events_FAILURE_in_scope']} in-scope failed banks "
-  f"have at least one positive row; the remainder stopped reporting more than four quarters before failing. The positive "
+  f"Of the {panel['failure_events_FAILURE_in_scope']} in-scope failed banks, "
+  f"{panel['failure_events_FAILURE_in_scope'] - ex['failure']} never filed a Call Report; every one of the "
+  f"{f0(ex['failure'])} failed banks in the panel has positive rows, and {panel['failed_banks_with_a_positive_label_row']} "
+  f"have them inside the modelling window up to 2025Q2 (the other two failed in July 2026). The positive "
   f"rate is {panel['positive_rate_pct']:.2f}%, i.e. about 1 in 150 bank-quarters (Figure 1).")
 FIGURE(FIG / "failures_per_year.png", "Bank failures per year (RESTYPE = FAILURE). Failures cluster in 1984–1993 and 2008–2014.", 14)
 
@@ -434,8 +437,8 @@ B(["**Projection pushdown:** only the columns used downstream are read from Parq
    "**Predicate pushdown:** the filter ASSET > 0 written after the scan appears inside it as SELECTION: col(\"ASSET\") > 0, "
    "and the RESTYPE = FAILURE filter is pushed into the failures scan; with a REPDTE or year filter, Hive partitions "
    "outside the range are never opened.",
-   "**Common-subexpression elimination:** the optimised plan contains cached sub-expressions (__POLARS_CSER_…) – e.g. "
-   "shift(1).over(CERT) of the quarter index is computed once and reused for all eight de-cumulated flows.",
+   "**Common-subexpression elimination:** the optimised plan contains cached sub-expressions (__POLARS_CSER_…) – the Q1 test "
+   "month(REPDTE) == 3 and the expression qi − 1 are computed once and reused by all eight de-cumulated flows.",
    "**Parallel window and join execution:** .over('CERT') is evaluated as a parallel group-by on all cores; lags are "
    "self-joins on (CERT, qi−4), which are hash joins rather than Python loops. Rolling statistics use rolling_*_by on the "
    "quarter index, so a missing quarter shrinks the window instead of silently using an older report.",
@@ -445,7 +448,7 @@ H("4.2 Benchmark against pandas", 2)
 P("The same pipeline (clean → de-cumulate → label → ratios → 4-quarter lags → trailing rolling statistics → state medians) "
   "was written idiomatically in pandas (vectorised, groupby/shift/merge/rolling, no Python loops) and run against Polars in "
   "three modes. To be fair, every run starts in a fresh subprocess (cold Python, same files), peak memory is the process "
-  "peak working set, and each configuration is run three times (median reported). The outputs are compared value by value.")
+  "peak working set, and each configuration on the real data is run three times (median reported; the scaling runs below once each). The outputs are compared value by value.")
 bt = bench[bench.scale == 1][["engine", "seconds_median", "seconds_min", "peak_mb_median"]].copy()
 bt["speed-up vs pandas"] = (pd_t / bt.seconds_median).map(lambda v: f"{v:.1f}×")
 bt["seconds_median"] = bt.seconds_median.map(f2); bt["seconds_min"] = bt.seconds_min.map(f2)
@@ -672,7 +675,7 @@ H("7. Conclusions (Part 6)")
 P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compressed Parquet layer partitioned by year "
   f"({st_part.size_MB:.0f} MB instead of {st_csv.size_MB:.0f} MB of CSV, {st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× "
   f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the whole "
-  f"pipeline, {pd_t / pl_t:.0f}× faster than pandas). Spark gives identical results but is "
+  f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but is "
   f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower on one machine; a cluster becomes "
   f"necessary only beyond roughly {rows_fit_16gb / 1e6:,.0f} M rows per job, for loan- or transaction-level data, strict "
   f"processing windows or many concurrent users.")

@@ -1,6 +1,6 @@
 check,finding,rows/banks affected,handling in pipeline
 Completeness,0 quarters with row count != API total,0,download re-run until 0 (resumable manifest)
-Primary key,"0 duplicate (CERT, REPDTE)",0,assert in panel build (pipeline fails if > 0)
+Primary key,"0 duplicate (CERT, REPDTE)",0,checked automatically on every run (this report); none found
 Structural missingness,"fields not collected in early years: OTHBFHLB, P3ASSET",2,never imputed with future info: missing-indicator + training-block median; columns empty in a training block are dropped for that block
 Negative stock amounts,negative values in fields that cannot be negative,860,set to null (treated as a reporting error)
 Extreme ratios,ratios far outside economic range (tiny denominators),21397,ratios recomputed from amounts with safe division; winsorised at train-period 0.5/99.5 pct

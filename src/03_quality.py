@@ -91,7 +91,7 @@ def check_keys() -> None:
                    pl.col("CERT").null_count().alias("null_cert")).collect()
     dup = k["rows"][0] - k["unique"][0]
     p(f"* rows {k['rows'][0]:,}, unique keys {k['unique'][0]:,}, duplicates **{dup}**, null CERT {k['null_cert'][0]}.")
-    issue("Primary key", f"{dup} duplicate (CERT, REPDTE)", dup, "assert in panel build (pipeline fails if > 0)")
+    issue("Primary key", f"{dup} duplicate (CERT, REPDTE)", dup, "checked automatically on every run (this report); none found")
 
 
 # ------------------------------------------------------------------ 3. missingness by era
@@ -224,12 +224,12 @@ def check_failures() -> pd.DataFrame:
     f = FAIL.join(last, on="CERT", how="left")
     in_scope = f.filter(pl.col("FAILDATE") >= pl.date(1984, 4, 1))
     res = in_scope.group_by("RESTYPE").agg(pl.len().alias("events"),
-                                           pl.col("last_rep").is_null().sum().alias("no financials"))
+                                           pl.col("last_rep").is_null().sum().alias("no financials")).sort("RESTYPE")
     table(res.to_pandas(), "failures_by_restype", floatfmt=".0f")
     null_in_scope = in_scope.filter(pl.col("CERT").is_null()).height
     dup = FAIL.filter(pl.col("CERT").is_not_null() & pl.col("CERT").is_duplicated())
     combos = (dup.group_by("CERT").agg(pl.col("RESTYPE").sort().str.join("+").alias("events"))
-              .group_by("events").agg(pl.len().alias("banks")))
+              .group_by("events").agg(pl.len().alias("banks")).sort("events"))
     p(f"* Null CERT: {FAIL['CERT'].null_count()} rows, of which **{null_in_scope}** inside the 1984-2026 scope "
       f"(all null-CERT events are pre-1984 resolutions). Events before scope: "
       f"{FAIL.filter(pl.col('FAILDATE') < pl.date(1984, 4, 1)).height:,}.")
@@ -245,7 +245,7 @@ def check_failures() -> pd.DataFrame:
     table(lt, "failure_report_lag", floatfmt=".0f")
     after = fe.filter((pl.col("days") <= 0) & (pl.col("RESTYPE") == "FAILURE"))
     by = (after.group_by("SAVR", "FAILYR").agg(pl.len().alias("n"), pl.col("days").median().alias("median_days"))
-          .sort("n", descending=True).head(8))
+          .sort(["n", "SAVR", "FAILYR"], descending=[True, False, False]).head(8))
     p(f"{after.height} FAILURE events have Call Reports dated on/after FAILDATE. They are concentrated in:")
     table(by.to_pandas(), "failures_reported_after", floatfmt=".0f")
     p("These are mainly savings institutions placed in RTC conservatorship in 1989: FAILDATE is the date of "
@@ -272,7 +272,7 @@ def check_exits() -> None:
     ct = (ex.group_by("CHANGEC1").agg(pl.len().alias("exited_banks"),
                                       pl.col("in_failures").sum().alias("in_Failures_table"))
           .with_columns((100 * pl.col("in_Failures_table") / pl.col("exited_banks")).round(1).alias("% failed"))
-          .sort("exited_banks", descending=True).head(12))
+          .sort(["exited_banks", "CHANGEC1"], descending=[True, False]).head(12))
     table(ct.to_pandas(), "exit_codes", floatfmt=".1f")
     c211 = ex.filter(pl.col("CHANGEC1") == 211)
     nf = ex.filter(pl.col("in_failures"))
