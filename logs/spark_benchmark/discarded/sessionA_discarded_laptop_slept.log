@@ -1,0 +1,45 @@
+machine: 8 logical cores, 15.6 GB RAM
+  x1 polars 4 threads: total     1.5s (session   0.0s, compute     1.5s) peak    1299 MB
+  x1 polars 4 threads: total     1.3s (session   0.0s, compute     1.3s) peak    1487 MB
+  x1 polars 4 threads: total     1.3s (session   0.0s, compute     1.3s) peak    1448 MB
+  x1 polars 8 threads: total     0.9s (session   0.0s, compute     0.9s) peak    1401 MB
+  x1 polars 8 threads: total     1.0s (session   0.0s, compute     1.0s) peak    1315 MB
+  x1 polars 8 threads: total     1.0s (session   0.0s, compute     1.0s) peak    1412 MB
+  x1 spark  4 threads: total    84.2s (session  13.5s, compute    70.7s) peak    2027 MB
+  x1 spark  4 threads: total    80.7s (session  10.1s, compute    70.6s) peak    2123 MB
+  x1 spark  8 threads: total    69.7s (session  10.2s, compute    59.5s) peak    2110 MB
+  x1 spark  8 threads: total   159.9s (session  15.7s, compute   144.2s) peak    1960 MB
+  x1 parity: max relative difference of column sums across all runs = 4.3e-14
+  x2 polars 4 threads: total     3.3s (session   0.0s, compute     3.3s) peak    2157 MB
+  x2 polars 4 threads: total     2.5s (session   0.0s, compute     2.5s) peak    2419 MB
+  x2 polars 4 threads: total     2.8s (session   0.0s, compute     2.8s) peak    2420 MB
+  x2 polars 8 threads: total     2.2s (session   0.0s, compute     2.2s) peak    2592 MB
+  x2 polars 8 threads: total     2.0s (session   0.0s, compute     2.0s) peak    2418 MB
+  x2 polars 8 threads: total     2.0s (session   0.0s, compute     2.0s) peak    2567 MB
+  x2 spark  4 threads: total   113.1s (session  13.4s, compute    99.7s) peak    2590 MB
+  x2 spark  4 threads: total 76637.3s (session  11.2s, compute 76626.1s) peak    2131 MB
+  x2 spark  8 threads: total   162.2s (session  22.9s, compute   139.3s) peak    2538 MB
+  x2 spark  8 threads: total   160.3s (session  15.2s, compute   145.1s) peak    2408 MB
+  x2 parity: max relative difference of column sums across all runs = 8.4e-14
+  x4 polars 4 threads: total     8.1s (session   0.0s, compute     8.1s) peak    3882 MB
+  x4 polars 4 threads: total     7.7s (session   0.0s, compute     7.7s) peak    4096 MB
+  x4 polars 4 threads: total     7.7s (session   0.0s, compute     7.7s) peak    3850 MB
+  x4 polars 8 threads: total     7.0s (session   0.0s, compute     7.0s) peak    3712 MB
+  x4 polars 8 threads: total     6.7s (session   0.0s, compute     6.7s) peak    3722 MB
+  x4 polars 8 threads: total     7.1s (session   0.0s, compute     7.1s) peak    3952 MB
+  x4 spark  4 threads: total  2394.8s (session  14.7s, compute  2380.1s) peak    2696 MB
+  x4 spark  8 threads: total   138.9s (session  11.0s, compute   127.9s) peak    3423 MB
+  x4 parity: max relative difference of column sums across all runs = 5.9e-14
+          engine  threads  scale    rows  runs  session_s    compute_s      total_s  total_s_min  total_s_max  peak_tree_mb
+polars 4 threads        4      1 1681405     3   0.000000     1.286180     1.286180     1.267732     1.543375   1487.355469
+polars 8 threads        8      1 1681405     3   0.000000     0.960112     0.960112     0.938202     1.048510   1412.195312
+  spark local[4]        4      1 1681405     2  11.818210    70.619362    82.437572    80.675452    84.199691   2123.066406
+  spark local[8]        8      1 1681405     2  12.941938   101.845787   114.787725    69.664835   159.910615   2109.929688
+polars 4 threads        4      2 3364021     3   0.000000     2.753860     2.753860     2.486996     3.272403   2420.003906
+polars 8 threads        8      2 3364021     3   0.000000     1.995736     1.995736     1.987193     2.165969   2591.597656
+  spark local[4]        4      2 3364021     2  12.287334 38362.924701 38375.212035   113.097766 76637.326305   2589.800781
+  spark local[8]        8      2 3364021     2  19.043843   142.160803   161.204646   160.257531   162.151761   2537.609375
+polars 4 threads        4      4 6729253     3   0.000000     7.742929     7.742929     7.651234     8.128560   4095.750000
+polars 8 threads        8      4 6729253     3   0.000000     6.952886     6.952886     6.673805     7.094678   3951.835938
+  spark local[4]        4      4 6729253     1  14.685498  2380.101781  2394.787279  2394.787279  2394.787279   2695.585938
+  spark local[8]        8      4 6729253     1  10.975159   127.942734   138.917893   138.917893   138.917893   3422.937500

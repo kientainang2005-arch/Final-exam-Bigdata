@@ -23,7 +23,7 @@ time-ordered validation of an early-warning model.
 | `src/07_model.py` | Walk-forward CV on the development period, cost-based threshold, single test evaluation | 5 |
 | `src/08_feature_importance.py` | Permutation importance of the chosen model on the development folds only | 5 |
 | `src/09_test_subperiods.py` | Post-hoc split of the frozen test predictions by period (no refitting, no re-choosing) | 5 |
-| `src/spark_pipeline.py`, `src/10_spark_benchmark.py` | Spark vs. Polars at equal thread counts, fresh process per run; `--summarize-logs` rebuilds the table from `logs/spark_benchmark/` | 3 |
+| `src/spark_pipeline.py`, `src/10_spark_benchmark.py` | Spark vs. Polars at equal thread counts, fresh process per run; `--summarize-logs` rebuilds the table from `logs/spark_benchmark/session*.log` | 3 |
 | `results/` | All tables (CSV/JSON/Markdown) and figures produced by the pipeline (no raw data) | – |
 | `report/` | `build_report.py` and the generated report (DOCX + PDF) | – |
 
@@ -50,8 +50,9 @@ python src/06_features.py
 python src/07_model.py
 python src/08_feature_importance.py  # development period only
 python src/09_test_subperiods.py     # post-hoc split of the frozen test predictions
-python src/10_spark_benchmark.py --summarize-logs logs/spark_benchmark/*.log   # Spark vs Polars table from the saved runs
-python src/10_spark_benchmark.py --scales 1   # optional: re-measure (needs Java 17; run_all.py --spark-benchmark)
+python src/10_spark_benchmark.py --summarize-logs logs/spark_benchmark/session*.log   # Spark vs Polars table from the saved runs
+python src/10_spark_benchmark.py              # optional re-measure, x1/x2/x4 (~40 min, Java 17); --scales 1 for x1 only
+                                              # (run_all.py --spark-benchmark runs the full x1/x2/x4 version)
 python -m ipykernel install --sys-prefix --name bft65b   # kernel inside the venv (done by run_all.py)
 python notebooks/make_spark_notebook.py
 python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=bft65b notebooks/08_spark_demo.ipynb
@@ -71,9 +72,13 @@ Seeds are fixed (`SEED = 42` in `src/common.py`). All results in `results/` are 
 `logs/run_all.log` is the log of the end-to-end run of 6 November 2026 (steps 01–07 and the Spark notebook);
 steps 08–10 were added later and run separately. Step 08 uses development data only, and step 09
 only re-reads the test predictions that step 07 wrote. Neither changes any result of steps 01–07.
-On the author's laptop (x64 Python and JVM emulated on an ARM CPU) the Spark benchmark could not get past the
-×1 data: one session ended in a JVM crash and the next in a Windows crash. `logs/spark_benchmark/` keeps both logs;
-the report uses their completed ×1 runs.
+On the author's laptop (x64 Python and JVM emulated on an ARM CPU) no valid Spark-benchmark session got past the
+×1 data. Two earlier sessions reached ×2/×4 but were discarded for timing (the laptop slept during one, the other
+ran throttled on battery); their logs, whose Spark–Polars parity checks remain valid, are in
+`logs/spark_benchmark/discarded/`. Of the two sessions on mains power with sleep blocked, one ended in a JVM crash
+(excerpt in `logs/spark_benchmark/jvm_crash_session1_excerpt.txt`) and the next in a Windows crash; the report
+uses their completed ×1 runs (`logs/spark_benchmark/session*.log`). Session 1 ran an earlier version of the script
+without the automatic repeat of crashed runs; the measurement code was the same.
 
 ## Data
 

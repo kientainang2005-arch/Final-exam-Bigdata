@@ -445,7 +445,8 @@ B([
 ])
 ex = panel["exit_types"]
 P(f"The panel has {f0(panel['panel_rows'])} bank-quarters for {f0(panel['banks'])} banks: {f0(ex['failure'])} failed, "
-  f"{f0(ex['other exit (merger/closure)'])} exited otherwise and {f0(ex['active'])} still report in 2026Q2. The panel has two banks fewer than the raw "
+  f"{f0(ex['other exit (merger/closure)'])} exited otherwise and {f0(ex['active'])} still report in 2026Q2 (Table "
+  f"{tn('dq')} counts {f0(n_banks_raw - ex['active'])} exited banks because it uses the raw data). The panel has two banks fewer than the raw "
   f"Financials ({f0(n_banks_raw)}): two FSLIC institutions that failed in 1981–82 kept filing under the same CERT until "
   f"1996–99, and all of their reports are dated after FAILDATE. "
   f"Of the {f0(panel['failure_events_FAILURE_in_scope'])} in-scope failed banks, "
@@ -537,17 +538,23 @@ P(f"**Equal threads and repeated runs (Table {tn('spark_bench')}).** The noteboo
   f"on all eight cores. src/10_spark_benchmark.py therefore runs the same job – the steps of Table "
   f"{tn('spark_parity')}, ending in the sums of the 15 output columns so that every window, join and median is "
   f"computed – with Spark local[4] and local[8] and with Polars at 4 and 8 threads. Every run is a fresh process, "
-  f"Spark's session (JVM) start-up is timed separately, peak memory is the sampled peak RSS of the whole process "
-  f"tree (Python + JVM), and the laptop ran on mains power with sleep blocked. The script was written for the ×1, "
-  f"×2 and ×4 data, but on this laptop no session got past ×1: the first ended when the emulated x64 JVM crashed "
-  f"with an access violation in its garbage collector, the second when Windows itself crashed. Table "
-  f"{tn('spark_bench')} therefore reports all completed ×1 runs of the two sessions (logs in logs/spark_benchmark/, "
-  f"summarised by the same script); Spark local[8] has only {int(_s8.runs)} completed run. At equal threads Spark's "
-  f"computation alone takes {eq_r4:.0f} times (4 threads) and {eq_r8:.0f} times (8 threads) as long as the whole "
-  f"Polars job, plus a median {_s4.session_s:.0f} s of JVM start-up per job, and it needs about "
-  f"{_s4.peak_tree_mb / _p4.peak_tree_mb:.1f} times the memory. The JVM crash is a further practical point for "
-  f"Section 4.4: on one modest machine the JVM stack was not only slower but also less robust (the Windows crash "
-  f"happened while Spark was running, but its cause was not established).")
+  f"Spark's session (JVM) start-up is timed separately, and peak memory is the peak RSS of the whole process tree "
+  f"(Python + JVM), sampled every 0.2 s. The script was written for the ×1, ×2 and ×4 data, but on this laptop no "
+  f"valid session got past ×1. Two earlier sessions that reached ×2 and ×4 were discarded for timing, because the "
+  f"laptop slept during one and ran throttled on battery in the other; their checks still show that Spark's column "
+  f"sums equal Polars' to within 8.4e-14 at every size (logs in logs/spark_benchmark/discarded/). Of the two "
+  f"sessions run on mains power with sleep blocked, the first ended when the emulated x64 JVM crashed with an "
+  f"access violation in its garbage collector (logs/spark_benchmark/jvm_crash_session1_excerpt.txt) and the second "
+  f"when Windows itself crashed. Table {tn('spark_bench')} reports all completed ×1 runs of these two sessions, "
+  f"summarised from their logs; Spark local[8] has only {int(_s8.runs)} completed run, and session 1 ran an earlier "
+  f"version of the script without the automatic repeat of crashed runs (same measurement code). At equal threads "
+  f"Spark's computation alone takes {eq_r4:.0f} times (4 threads) and {eq_r8:.0f} times (8 threads) as long as the "
+  f"whole Polars job, plus a median {_s4.session_s:.0f} s of JVM start-up per job; its process tree peaks at "
+  f"{f0(_s4.peak_tree_mb)} MB against {f0(_p4.peak_tree_mb)}–{f0(pl_m)} MB for Polars (Tables {tn('spark_bench')} and "
+  f"{tn('bench')}; a one-second Polars job is sampled only a few times, so Table {tn('bench')}'s exact peak is the "
+  f"safer comparison). The JVM crash is a further practical point for Section 4.4: on one modest machine the JVM "
+  f"stack was not only slower but also less robust (the Windows crash happened while Spark was running, but its "
+  f"cause was not established).")
 _sb = sbm.reset_index()
 _sb = pd.DataFrame({"Configuration (×1, 1.68 M rows)": _sb.config, "Completed runs": _sb.runs.astype(int).astype(str),
                     "Start-up, median (s)": _sb.session_s.map(lambda v: "–" if v == 0 else f"{v:.1f}"),
@@ -556,7 +563,8 @@ _sb = pd.DataFrame({"Configuration (×1, 1.68 M rows)": _sb.config, "Completed r
                     "Total, min–max (s)": _sb.total_s_min.map(lambda v: f"{v:.1f}") + "–" + _sb.total_s_max.map(lambda v: f"{v:.1f}"),
                     "Peak memory (MB)": _sb.peak_tree_mb.map(f0)})
 T("spark_bench", _sb, "Spark vs. Polars at equal thread counts on the real panel: all completed runs of two "
-  "benchmark sessions (fresh process per run; Spark start-up timed separately; peak memory of the process tree).",
+  "benchmark sessions (fresh process per run; Spark start-up timed separately; times are medians, peak memory "
+  "is the maximum over runs of the process tree).",
   widths=[4.2, 1.7, 2.0, 2.0, 2.0, 2.2, 2.0], size=8)
 H("4.4 When would a cluster be justified?", 2)
 P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {f0(pl_m)} MB in memory for "
@@ -565,9 +573,10 @@ P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most
   f"{x8l_mem * 2**20 / x8_rows:,.0f} bytes per output row, so with 70% of 16 GB usable a single laptop can process about "
   f"{rows_fit_16gb / 1e6:,.0f} M bank-quarter rows in memory – about {rows_fit_16gb / panel['panel_rows']:.0f} times the "
   f"FDIC panel – and the streaming engine and out-of-core sinks push this further. On this data Spark's "
-  f"computation is {eq_lo:.0f}–{eq_hi:.0f} times slower than Polars at equal threads (Table {tn('spark_bench')}), plus "
-  f"about {_s4.session_s:.0f} s of JVM start-up per job, because of task scheduling, serialisation and shuffle "
-  f"overhead. A cluster is justified only when one of these conditions holds:")
+  f"computation takes {eq_lo:.0f}–{eq_hi:.0f} times as long as the Polars job at equal threads (Table "
+  f"{tn('spark_bench')}), plus about {_s4.session_s:.0f} s of JVM start-up per job. Task scheduling, serialisation "
+  f"and shuffles add overhead on a single machine; the emulation of the x64 JVM on this ARM CPU may add more, and "
+  f"it may penalise the two engines differently, so the exact ratio is specific to this laptop. A cluster is justified only when one of these conditions holds:")
 B(["the working set exceeds one machine's memory even with streaming – e.g. loan-level credit-registry data "
    "(hundreds of millions of loan-months) or transaction data, not quarterly bank aggregates;",
    "the job must finish within a fixed window that one machine cannot meet (e.g. daily stress tests over many scenarios);",
@@ -658,7 +667,7 @@ P(f"The baseline is the classic supervisory logit on five CAMELS ratios (equity/
   f"gradient boosting) captures non-linear thresholds and interactions such as ‘high CRE concentration and falling "
   f"capital’ and handles missing values natively; its hyper-parameters were chosen from 8 combinations by mean "
   f"walk-forward PR-AUC (learning rate {hgbp['learning_rate']}, {hgbp['max_leaf_nodes']} leaves, at least "
-  f"{hgbp['min_samples_leaf']} rows per leaf, {hgbp['max_iter']} trees). HGB is clearly best on every development metric "
+  f"{hgbp['min_samples_leaf']} rows per leaf, {hgbp['max_iter']} trees). HGB is clearly best on every development metric (Figure 3) "
   f"and was selected; the model, features and threshold were frozen to results/frozen_choices.json before any "
   f"test-period prediction was made (per-fold results for all models: Table {tn('cva')}). No choice was revisited after the test evaluation; the end-to-end reproducibility run "
   f"(run_all.py, log in logs/run_all.log) recomputes the same frozen choices and the identical test metrics "
@@ -762,7 +771,7 @@ for _f in ("eq_ta", "n_reports", "roa_4q", "texas", "d4_eq_ta", "npa_ta"):
     assert _f in set(_top.feature), f"text below names {_f}, which is no longer in the top 10"
 P(f"Permutation importance of the selected HGB configuration was computed on each development walk-forward fold: the "
   f"model is fitted on the fold's training block, and the drop in validation PR-AUC when one feature is shuffled is "
-  f"measured (3 repeats; src/08_feature_importance.py). The test period is not used. Table {tn('importance')} lists the "
+  f"measured (3 repeats; src/08_feature_importance.py). The test period is not used. Figure 5 shows the twelve most important features and Table {tn('importance')} lists the "
   f"ten most important features with the direction of their medians in failing versus other development "
   f"bank-quarters. The leading signals follow the CAMELS logic (FDIC, 1997): thin capital (eq_ta) ranks first, "
   f"and – apart from n_reports, discussed below – the next signals are weak earnings (roa_4q, the trailing four-quarter "
@@ -788,7 +797,7 @@ P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compre
   f"({st_part.size_MB:.0f} MB instead of {st_csv.size_MB:.0f} MB of CSV, {st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× "
   f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the core "
   f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but, at equal "
-  f"threads, its computation is {eq_lo:.0f}–{eq_hi:.0f} times slower on one machine, and its emulated JVM crashed "
+  f"threads, its computation takes {eq_lo:.0f}–{eq_hi:.0f} times as long on one machine, and its emulated JVM crashed "
   f"during benchmarking; a cluster becomes "
   f"necessary only beyond roughly {rows_fit_16gb / 1e6:,.0f} M rows per job, for loan- or transaction-level data, strict "
   f"processing windows or many concurrent users.")
@@ -801,7 +810,7 @@ P(f"**Q2 – Data quality without look-ahead.** The raw data contain year-to-dat
 P(f"**Q3 – Honest validation.** Yes. With a time-ordered split, a four-quarter gap, walk-forward selection, preprocessing "
   f"fitted inside each training block, a cost-based threshold frozen before testing and a single test evaluation, the "
   f"pipeline's output supports a model that ranks banks well out of sample (test ROC-AUC {test.loc[chosen, 'roc_auc']:.3f}) "
-  f"and flags {pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 0)} of failing banks before failure, "
+  f"and flags {pct(ew['flagged_at_least_once'] / ew['failed_banks_in_test'], 1)} of failing banks before failure, "
   f"most of them a full four quarters ahead.")
 H("Limitations", 2)
 B(["The API serves the latest amended Call Reports, not the vintages available at the time, and reports are published "

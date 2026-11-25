@@ -41,11 +41,15 @@ if not a.skip_spark:
                     "--ExecutePreprocessor.timeout=3600", "--ExecutePreprocessor.kernel_name=bft65b",
                     "notebooks/08_spark_demo.ipynb"], cwd=ROOT, check=True)
 if a.spark_benchmark:
-    # measure Spark vs Polars at equal threads (needs Java 17; ~40 min for x1/x2/x4) and keep the log
-    with open(ROOT / "logs" / "spark_benchmark" / "rerun.log", "w", encoding="utf-8") as log:
+    # re-measure Spark vs Polars at equal threads (needs Java 17; x1/x2/x4, ~40 min). The script writes
+    # results/spark_benchmark.csv itself; its log goes to logs/spark_benchmark/rerun/ (not mixed with the
+    # author's sessions). Note: the report text describes the author's sessions and would need updating.
+    (ROOT / "logs" / "spark_benchmark" / "rerun").mkdir(parents=True, exist_ok=True)
+    with open(ROOT / "logs" / "spark_benchmark" / "rerun" / "rerun.log", "w", encoding="utf-8") as log:
         subprocess.run([sys.executable, "-u", "src/10_spark_benchmark.py"], cwd=ROOT, check=True, stdout=log)
-# summarise the benchmark logs in logs/spark_benchmark/ into results/spark_benchmark.csv (fast, no Spark)
-run(["src/10_spark_benchmark.py", "--summarize-logs",
-     *sorted(str(p.relative_to(ROOT)) for p in (ROOT / "logs" / "spark_benchmark").glob("*.log"))])
+else:
+    # rebuild results/spark_benchmark.csv from the author's two valid sessions (fast, no Spark)
+    run(["src/10_spark_benchmark.py", "--summarize-logs",
+         *sorted(str(p.relative_to(ROOT)) for p in (ROOT / "logs" / "spark_benchmark").glob("session*.log"))])
 run(["report/build_report.py"])
 print("\nAll steps finished. Results in results/, figures in results/figures/, report in report/.")

@@ -15,10 +15,13 @@ writes results/spark_benchmark.csv and results/spark_benchmark_parity.csv
     python src/10_spark_benchmark.py --summarize-logs logs/spark_benchmark/*.log
 rebuilds results/spark_benchmark.csv from the per-run lines printed in benchmark logs.
 
-On the author's laptop (x64 Python and JVM emulated on an ARM CPU) no session reached x2: one ended when the
-JVM crashed (access violation in its garbage collector) and the next when Windows itself crashed. The report
-therefore uses the completed x1 runs of those two sessions, which were taken on mains power with sleep
-blocked. Their logs are kept in logs/spark_benchmark/ and summarised with --summarize-logs.
+On the author's laptop (x64 Python and JVM emulated on an ARM CPU) no VALID session got past x1. Two earlier
+sessions reached x2/x4 but were discarded for timing (the laptop slept during one, the other ran throttled on
+battery); their parity checks are still valid and are kept in logs/spark_benchmark/discarded/. Of the two
+sessions on mains power with sleep blocked, the first ended when the JVM crashed (access violation in its
+garbage collector, see logs/spark_benchmark/jvm_crash_session1_excerpt.txt) and the second when Windows itself
+crashed. The report uses their completed x1 runs, summarised with --summarize-logs. Session 1 ran an earlier
+version of this script without the automatic repeat of crashed Spark runs; the measurement code was the same.
 """
 from __future__ import annotations
 
@@ -203,8 +206,8 @@ def main() -> None:
                 if engine == "polars":
                     assert runs[0]["threads"] == th, f"Polars used {runs[0]['threads']} threads, expected {th}"
                 sums[(engine, th)] = runs[0]["sums"]
-                rows.append({"engine": f"{engine} {'local[' + str(th) + ']' if engine == 'spark' else str(th) + ' threads'}",
-                             "threads": th, "scale": scale, "rows": runs[0]["rows"], "runs": reps,
+                rows.append({"config": f"{engine} {'local[' + str(th) + ']' if engine == 'spark' else str(th) + ' threads'}",
+                             "scale": scale, "engine": engine, "threads": th, "rows": runs[0]["rows"], "runs": reps,
                              "session_s": statistics.median(r["session_s"] for r in runs),
                              "compute_s": statistics.median(r["compute_s"] for r in runs),
                              "total_s": statistics.median(r["total_s"] for r in runs),
