@@ -3,7 +3,7 @@ Feature definitions (Part 4). Pure Polars expressions on the bank-quarter panel.
 
 Point-in-time contract: a feature for (bank i, quarter q) uses only
   * bank i's reports with REPDTE <= q (lags via self-join on the quarter index), and
-  * cross-sectional aggregates of OTHER banks' reports at quarters <= q, and
+  * same-quarter cross-sectional aggregates of all banks' reports (including the bank itself), and
   * failures with FAILDATE <= REPDTE_q (public at that time).
 No statistic of the full sample (mean, quantile, scaler...) is computed here: anything
 fitted lives in the sklearn Pipeline and is fitted on the training period only.

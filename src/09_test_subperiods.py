@@ -26,7 +26,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 PERIODS = [("Full test period", "2008-03-31", "2025-06-30"),
            ("Crisis wave 2008-2014", "2008-03-31", "2014-12-31"),
-           ("Calm period 2015-2025Q2", "2015-03-31", "2025-06-30")]
+           ("Low-failure period 2015-2025Q2", "2015-03-31", "2025-06-30")]
 
 
 def block(d: pd.DataFrame, thr: float) -> dict:

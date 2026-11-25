@@ -3,8 +3,8 @@ Step 8 - Feature importance on the DEVELOPMENT period only (Part 5, explainabili
 
 For every walk-forward fold of 07_model.py, the frozen HGB configuration (results/hgb_best_params.json)
 is fitted on the fold's training block and permutation importance is measured on the fold's validation
-block as the drop in PR-AUC (average precision) when one feature is shuffled. The test period is never
-loaded into the computation, so this analysis cannot influence or be influenced by the test evaluation.
+block as the drop in PR-AUC (average precision) when one feature is shuffled. Test-period rows are filtered out
+before any computation, so this analysis cannot influence or be influenced by the test evaluation.
 
     python src/08_feature_importance.py
 writes results/feature_importance_dev.csv and results/figures/feature_importance_dev.png

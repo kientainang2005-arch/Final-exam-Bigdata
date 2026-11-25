@@ -528,7 +528,7 @@ P("**Reading the physical plan** (explain('formatted') in the notebook, read bot
   "without cache() every action re-executes the whole lineage from the scan, so the MLlib part caches the feature "
   "table first (35 s once, instead of once per pass of every estimator).")
 H("4.4 When would a cluster be justified?", 2)
-P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {pl_m / 1024:.1f} GB in memory for "
+P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {f0(pl_m)} MB in memory for "
   f"the benchmarked core pipeline (Table {tn('bench')}), which takes {pl_t:.1f} s; building the full 40-feature table and writing it "
   f"takes {feats['seconds']:.0f} s. From the scaling experiment the lazy engine needs roughly "
   f"{x8l_mem * 2**20 / x8_rows:,.0f} bytes per output row, so with 70% of 16 GB usable a single laptop can process about "
@@ -690,16 +690,17 @@ P(f"Two results deserve an honest reading. First, all models score much higher o
   f"as expensive. Alarms track the crisis closely and fall to a few dozen per quarter after 2014 (Figure 4).")
 FIGURE(FIG / "test_alarms_over_time.png", "Test period: number of alarms vs. banks failing within four quarters, by quarter.", 15.5)
 _sp = subp.set_index("period")
-_cr, _ca = _sp.loc["Crisis wave 2008-2014"], _sp.loc["Calm period 2015-2025Q2"]
+_cr, _ca = _sp.loc["Crisis wave 2008-2014"], _sp.loc["Low-failure period 2015-2025Q2"]
 P(f"**Post-hoc breakdown by period (Table {tn('subperiods')}).** The single test evaluation is split into the crisis "
-  f"wave and the calm years that follow, using only the frozen scores and threshold (src/09_test_subperiods.py first "
+  f"wave and the low-failure years that follow (which include the 2023 failures), using only the frozen scores and threshold (src/09_test_subperiods.py first "
   f"checks that the pooled numbers equal Table {tn('test')}); nothing is refitted or re-chosen. In 2008–2014 the model "
   f"reaches PR-AUC {_cr.pr_auc:.3f} and flags {int(_cr.failing_banks_flagged)} of {int(_cr.failing_banks)} failing banks. "
-  f"In 2015–2025Q2 failures are rare ({_ca.base_rate_pct:.2f}% of bank-quarters, {int(_ca.failing_banks)} banks): the "
+  f"In 2015–2025Q2 failures are rare: only {_ca.base_rate_pct:.2f}% of bank-quarters are positive (failure within "
+  f"four quarters) and {int(_ca.failing_banks)} banks fail. The "
   f"ranking stays good (ROC-AUC {_ca.roc_auc:.3f}) but PR-AUC falls to {_ca.pr_auc:.3f} and "
   f"{int(_ca.failing_banks_flagged)} of {int(_ca.failing_banks)} failing banks are flagged. When positives are this "
   f"scarce, every alarm is much more likely to be a false one, which a supervisor should expect outside crises. "
-  f"{int(_cr.failing_banks + _ca.failing_banks - _sp.loc['Full test period'].failing_banks)} banks have positive rows in "
+  f"In total, {int(_cr.failing_banks + _ca.failing_banks - _sp.loc['Full test period'].failing_banks)} banks have positive rows in "
   f"both periods, so the bank counts add up to more than {int(_sp.loc['Full test period'].failing_banks)}.")
 st_ = subp.copy()
 st_ = pd.DataFrame({"Period": st_.period, "Bank-quarters": st_.bank_quarters.map(f0),
@@ -732,7 +733,9 @@ P(f"Permutation importance of the selected HGB configuration was computed on eac
   f"measured (3 repeats; src/08_feature_importance.py). The test period is not used. Table {tn('importance')} lists the "
   f"ten most important features with the direction of their medians in failing versus other development "
   f"bank-quarters. The leading signals follow the CAMELS logic (FDIC, 1997): thin capital (eq_ta) ranks first, "
-  f"followed by weak earnings (roa_4q, the trailing four-quarter mean ROA), bad assets relative to loss-absorbing capital (texas, npa_ta) and "
+  f"and – apart from n_reports, discussed below – the next signals are weak earnings (roa_4q, the trailing four-quarter "
+  f"mean ROA), bad assets relative to loss-absorbing capital (texas) and to total assets (npa_ta), less agricultural "
+  f"lending (ag_ln, lower in failing banks) and "
   f"eroding capital (d4_eq_ta). Two caveats apply. Importance varies strongly across folds (the standard deviations "
   f"are of the same order as the means), so the ranking beyond the first few features is not stable. And the "
   f"second-ranked feature, n_reports, counts the quarters a bank has reported since 1984Q1: it captures bank age – "
@@ -770,7 +773,7 @@ P(f"**Q3 – Honest validation.** Yes. With a time-ordered split, a four-quarter
 H("Limitations", 2)
 B(["The API serves the latest amended Call Reports, not the vintages available at the time, and reports are published "
    "30–60 days after quarter end; a production EWS would need vintage data and a publication lag in the label window.",
-   f"Failures cluster in two crises: in the calm 2015–2025Q2 part of the test period only {int(_ca.failing_banks)} banks "
+   f"Failures cluster in two crises: in the low-failure 2015–2025Q2 part of the test period only {int(_ca.failing_banks)} banks "
    f"fail and PR-AUC drops to {_ca.pr_auc:.3f} (Table {tn('subperiods')}), so performance outside crises is estimated "
    "with large uncertainty.",
    "The avoidable share of loss and the examination cost are not observed in the FDIC data; the exact threshold moves "
@@ -790,8 +793,8 @@ B(["**Scale and tools:** about 50 banks reporting to the State Bank of Vietnam (
    "**Data definitions:** Vietnamese reports follow VAS and SBV circulars (e.g. Circular 31/2024 on loan classification, "
    "Circulars 41/2016 and 22/2019 on capital and liquidity ratios); every field mapping, unit and year-to-date convention "
    "must be audited in the same automated way, and state-owned banks may need separate treatment.",
-   "**Hidden problem loans:** since 2013 banks have been able to sell non-performing loans to the Vietnam Asset "
-   "Management Company (VAMC) for special bonds and provision for those bonds over several years, and temporary "
+   "**Hidden problem loans:** since 2013 (Decree 53/2013/ND-CP) banks have been able to sell non-performing loans to the "
+   "Vietnam Asset Management Company (VAMC) for special bonds and provision for those bonds over several years, and temporary "
    "forbearance rules let restructured loans keep their loan group. Reported NPL ratios therefore understate problem "
    "assets; a Vietnamese version of the Texas ratio should add loans sold to VAMC that are not yet fully provisioned "
    "and restructured loans to the numerator.",
@@ -814,6 +817,15 @@ B(["Cole, R. A. & White, L. J. (2012). Déjà Vu All Over Again: The Causes of U
    "https://api.fdic.gov/banks/docs/ (data downloaded 6 November 2026; dictionaries copied to docs/fdic_dictionary/).",
    "Saito, T. & Rehmsmeier, M. (2015). The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating "
    "Binary Classifiers on Imbalanced Datasets. PLoS ONE, 10(3), e0118432. https://doi.org/10.1371/journal.pone.0118432",
+   "Government of Vietnam (2013). Decree No. 53/2013/ND-CP on the establishment, organisation and operation of the "
+   "Vietnam Asset Management Company (VAMC).",
+   "National Assembly of Vietnam (2024). Law on Credit Institutions No. 32/2024/QH15.",
+   "State Bank of Vietnam (2016). Circular No. 41/2016/TT-NHNN on capital adequacy ratios of banks and foreign bank "
+   "branches.",
+   "State Bank of Vietnam (2019). Circular No. 22/2019/TT-NHNN on prudential limits and ratios in the operation of "
+   "banks and foreign bank branches.",
+   "State Bank of Vietnam (2024). Circular No. 31/2024/TT-NHNN on the classification of assets of commercial banks, "
+   "non-bank credit institutions and foreign bank branches.",
    "BFT65B course materials: exam paper and the starter script fdic_download_starter.py, adapted in src/01_download.py.",
    "Software: Polars 1.44, pandas 3.1, PyArrow 26, PySpark 4.3, scikit-learn 1.9, matplotlib 3.11, python-docx 1.2 "
    "(exact versions in requirements.txt)."], style="List Number")
@@ -857,7 +869,7 @@ H("C. Feature dictionary", 2)
 fd = fdict.copy()
 for c in ("median_failing (y=1)", "median_others (y=0)"):
     fd[c] = fd[c].map(lambda v: "" if pd.isna(v) else ("0" if abs(v) < 5e-5 else f"{v:.4g}"))
-fd["missing_pct"] = fd.missing_pct.map(lambda v: f"{v:.1f}")
+fd["missing_pct"] = fd.missing_pct.map(lambda v: f"{v:.2f}")
 fd.columns = ["Feature", "Group", "Rationale", "Missing %", "Median, y=1", "Median, y=0"]
 T("fdict", fd, "Feature dictionary; missing share and medians computed on the development period 1986Q1–2006Q4 only.", widths=[2.6, 1.2, 7.2, 1.6, 2.0, 2.0], size=7.5)
 H("D. Walk-forward results for all models and folds", 2)
