@@ -21,6 +21,8 @@ time-ordered validation of an early-warning model.
 | `notebooks/08_spark_demo.ipynb` | PySpark reproduction, row-level match with Polars, physical plan, MLlib demo | 3, 5 |
 | `src/features.py`, `src/06_features.py` | CAMELS-style point-in-time features + automatic look-ahead (truncation) test | 4 |
 | `src/07_model.py` | Walk-forward CV on the development period, cost-based threshold, single test evaluation | 5 |
+| `src/08_feature_importance.py` | Permutation importance of the chosen model on the development folds only | 5 |
+| `src/09_test_subperiods.py` | Post-hoc split of the frozen test predictions by period (no refitting, no re-choosing) | 5 |
 | `results/` | All tables (CSV/JSON/Markdown) and figures produced by the pipeline (no raw data) | – |
 | `report/` | `build_report.py` and the generated report (DOCX + PDF) | – |
 
@@ -28,8 +30,8 @@ Data files are **not** committed (`data_raw/`, `data/` are git-ignored); they ar
 
 ## How to reproduce
 
-Tested on Windows 11, Python 3.13, 16 GB RAM, 8 cores. Measured runtime of `run_all.py`: ≈ 18 min for the download, then ≈ 25 min for all other steps
-(storage benchmark 4.5 min, engine benchmark 3 min, modelling 8 min, Spark notebook ≈ 6 min).
+Tested on Windows 11, Python 3.13, 16 GB RAM, 8 cores. Measured runtime of `run_all.py`: ≈ 18 min for the download, then ≈ 35 min for all other steps
+(storage benchmark 4.5 min, engine benchmark 3 min, modelling 8 min, feature importance 10 min, Spark notebook ≈ 6 min).
 
 ```bash
 python -m venv .venv
@@ -45,6 +47,8 @@ python src/04_panel.py
 python src/05_benchmark.py           # add --quick for a 1-repeat run without the scaling test
 python src/06_features.py
 python src/07_model.py
+python src/08_feature_importance.py  # development period only
+python src/09_test_subperiods.py     # post-hoc split of the frozen test predictions
 python -m ipykernel install --sys-prefix --name bft65b   # kernel inside the venv (done by run_all.py)
 python notebooks/make_spark_notebook.py
 python -m nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=bft65b notebooks/08_spark_demo.ipynb

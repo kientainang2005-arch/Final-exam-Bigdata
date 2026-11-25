@@ -18,3 +18,12 @@ logs/*
 
 # course exam paper (instructor material, not redistributed)
 final_report_bft65b.pdf
+
+# notes for AI assistant sessions (handoff / context files) - never commit
+logs/handoff/
+.claude/
+CLAUDE.md
+HANDOFF*.md
+
+# JVM crash reports (written to the working directory when Java crashes)
+hs_err_pid*.log
