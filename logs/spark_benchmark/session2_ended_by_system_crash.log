@@ -1,0 +1,9 @@
+machine: 8 logical cores, 15.6 GB RAM
+  x1 polars 4 threads: total     1.6s (session   0.0s, compute     1.6s) peak    1385 MB
+  x1 polars 4 threads: total     1.5s (session   0.0s, compute     1.5s) peak    1430 MB
+  x1 polars 4 threads: total     1.4s (session   0.0s, compute     1.4s) peak    1418 MB
+  x1 polars 8 threads: total     1.0s (session   0.0s, compute     1.0s) peak    1366 MB
+  x1 polars 8 threads: total     0.9s (session   0.0s, compute     0.9s) peak    1412 MB
+  x1 polars 8 threads: total     0.9s (session   0.0s, compute     0.9s) peak    1456 MB
+  x1 spark  4 threads: total   100.3s (session  11.3s, compute    89.0s) peak    2136 MB
+  x1 spark  4 threads: total    92.5s (session  10.3s, compute    82.2s) peak    2100 MB

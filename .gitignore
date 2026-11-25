@@ -15,6 +15,7 @@ derby.log
 logs/*
 !logs/download.log
 !logs/run_all.log
+!logs/spark_benchmark/
 
 # course exam paper (instructor material, not redistributed)
 final_report_bft65b.pdf

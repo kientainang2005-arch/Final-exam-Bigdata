@@ -54,6 +54,11 @@ fdict = csv("feature_dictionary.csv")
 by_year = csv("panel_by_year.csv")
 spark_cmp = csv("spark_vs_polars.csv")
 subp = csv("test_subperiods.csv")
+sbm = csv("spark_benchmark.csv").set_index("config")
+_s4, _s8 = sbm.loc["spark local[4]"], sbm.loc["spark local[8]"]
+_p4, _p8 = sbm.loc["polars 4 threads"], sbm.loc["polars 8 threads"]
+eq_r4, eq_r8 = _s4.compute_s / _p4.total_s, _s8.compute_s / _p8.total_s     # Spark compute / whole Polars job
+eq_lo, eq_hi = min(eq_r4, eq_r8), max(eq_r4, eq_r8)
 imp = csv("feature_importance_dev.csv")
 spark_t = csv("spark_timing.csv")
 mllib = csv("mllib_demo.csv") if (R / "mllib_demo.csv").exists() else None
@@ -169,7 +174,7 @@ def shade(cell, hexcolor):
     tcPr.append(shd)
 
 
-TABLE_ORDER = ["first", "storage", "bench", "spark_parity", "features", "folds", "cv", "sens",
+TABLE_ORDER = ["first", "storage", "bench", "spark_parity", "spark_bench", "features", "folds", "cv", "sens",
                "test", "subperiods", "importance", "dq", "completeness", "fdict", "cva"]
 
 
@@ -511,7 +516,8 @@ T("spark_parity", sc, "Spark vs. Polars on the same 1,681,405 panel rows through
 P(f"All rows and columns match; the only differences (≤ {max_spark_diff:.0e}) are floating-point summation order in "
   f"the rolling statistics (roa_vol8, roa_4q). Spark needed {sp_t.get('spark local[*]', float('nan')):.0f} s for this job against "
   f"{sp_t.get('polars lazy', float('nan')):.1f} s for Polars on the same laptop (a single run inside the notebook, "
-  f"whereas Table {tn('bench')} reports the median of three runs in fresh processes).")
+  f"whereas Table {tn('bench')} reports the median of three runs in fresh processes; repeated runs at equal "
+  f"thread counts follow in Table {tn('spark_bench')}).")
 P("**Reading the physical plan** (explain('formatted') in the notebook, read bottom-up). (1) Scan parquet: ReadSchema "
   "lists only the 17 of 49 columns the job needs and PushedFilters contains GreaterThan(ASSET, 0) – the same projection "
   "and predicate pushdown as Polars; with a year filter (notebook section 1) the scan also shows PartitionFilters, i.e. "
@@ -527,15 +533,41 @@ P("**Reading the physical plan** (explain('formatted') in the notebook, read bot
   "machine it is pure serialisation overhead, which is why Spark is slower than Polars here. Spark is also lazy: "
   "without cache() every action re-executes the whole lineage from the scan, so the MLlib part caches the feature "
   "table first (35 s once, instead of once per pass of every estimator).")
+P(f"**Equal threads and repeated runs (Table {tn('spark_bench')}).** The notebook timing above is a single run "
+  f"on all eight cores. src/10_spark_benchmark.py therefore runs the same job – the steps of Table "
+  f"{tn('spark_parity')}, ending in the sums of the 15 output columns so that every window, join and median is "
+  f"computed – with Spark local[4] and local[8] and with Polars at 4 and 8 threads. Every run is a fresh process, "
+  f"Spark's session (JVM) start-up is timed separately, peak memory is the sampled peak RSS of the whole process "
+  f"tree (Python + JVM), and the laptop ran on mains power with sleep blocked. The script was written for the ×1, "
+  f"×2 and ×4 data, but on this laptop no session got past ×1: the first ended when the emulated x64 JVM crashed "
+  f"with an access violation in its garbage collector, the second when Windows itself crashed. Table "
+  f"{tn('spark_bench')} therefore reports all completed ×1 runs of the two sessions (logs in logs/spark_benchmark/, "
+  f"summarised by the same script); Spark local[8] has only {int(_s8.runs)} completed run. At equal threads Spark's "
+  f"computation alone takes {eq_r4:.0f} times (4 threads) and {eq_r8:.0f} times (8 threads) as long as the whole "
+  f"Polars job, plus a median {_s4.session_s:.0f} s of JVM start-up per job, and it needs about "
+  f"{_s4.peak_tree_mb / _p4.peak_tree_mb:.1f} times the memory. The JVM crash is a further practical point for "
+  f"Section 4.4: on one modest machine the JVM stack was not only slower but also less robust (the Windows crash "
+  f"happened while Spark was running, but its cause was not established).")
+_sb = sbm.reset_index()
+_sb = pd.DataFrame({"Configuration (×1, 1.68 M rows)": _sb.config, "Completed runs": _sb.runs.astype(int).astype(str),
+                    "Start-up, median (s)": _sb.session_s.map(lambda v: "–" if v == 0 else f"{v:.1f}"),
+                    "Compute, median (s)": _sb.compute_s.map(lambda v: f"{v:.2f}" if v < 10 else f"{v:.1f}"),
+                    "Total, median (s)": _sb.total_s.map(lambda v: f"{v:.2f}" if v < 10 else f"{v:.1f}"),
+                    "Total, min–max (s)": _sb.total_s_min.map(lambda v: f"{v:.1f}") + "–" + _sb.total_s_max.map(lambda v: f"{v:.1f}"),
+                    "Peak memory (MB)": _sb.peak_tree_mb.map(f0)})
+T("spark_bench", _sb, "Spark vs. Polars at equal thread counts on the real panel: all completed runs of two "
+  "benchmark sessions (fresh process per run; Spark start-up timed separately; peak memory of the process tree).",
+  widths=[4.2, 1.7, 2.0, 2.0, 2.0, 2.2, 2.0], size=8)
 H("4.4 When would a cluster be justified?", 2)
 P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {f0(pl_m)} MB in memory for "
   f"the benchmarked core pipeline (Table {tn('bench')}), which takes {pl_t:.1f} s; building the full 40-feature table and writing it "
   f"takes {feats['seconds']:.0f} s. From the scaling experiment the lazy engine needs roughly "
   f"{x8l_mem * 2**20 / x8_rows:,.0f} bytes per output row, so with 70% of 16 GB usable a single laptop can process about "
   f"{rows_fit_16gb / 1e6:,.0f} M bank-quarter rows in memory – about {rows_fit_16gb / panel['panel_rows']:.0f} times the "
-  f"FDIC panel – and the streaming engine and out-of-core sinks push this further. On this data Spark is "
-  f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower because of task scheduling, serialisation "
-  f"and shuffle overhead (JVM start-up is not included in the measured time). A cluster is justified only when one of these conditions holds:")
+  f"FDIC panel – and the streaming engine and out-of-core sinks push this further. On this data Spark's "
+  f"computation is {eq_lo:.0f}–{eq_hi:.0f} times slower than Polars at equal threads (Table {tn('spark_bench')}), plus "
+  f"about {_s4.session_s:.0f} s of JVM start-up per job, because of task scheduling, serialisation and shuffle "
+  f"overhead. A cluster is justified only when one of these conditions holds:")
 B(["the working set exceeds one machine's memory even with streaming – e.g. loan-level credit-registry data "
    "(hundreds of millions of loan-months) or transaction data, not quarterly bank aggregates;",
    "the job must finish within a fixed window that one machine cannot meet (e.g. daily stress tests over many scenarios);",
@@ -755,8 +787,9 @@ H("7. Conclusions (Part 6)")
 P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compressed Parquet layer partitioned by year "
   f"({st_part.size_MB:.0f} MB instead of {st_csv.size_MB:.0f} MB of CSV, {st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× "
   f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the core "
-  f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but is "
-  f"{sp_t.get('spark local[*]', 1) / max(sp_t.get('polars lazy', 1), 1e-9):.0f}× slower on one machine; a cluster becomes "
+  f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but, at equal "
+  f"threads, its computation is {eq_lo:.0f}–{eq_hi:.0f} times slower on one machine, and its emulated JVM crashed "
+  f"during benchmarking; a cluster becomes "
   f"necessary only beyond roughly {rows_fit_16gb / 1e6:,.0f} M rows per job, for loan- or transaction-level data, strict "
   f"processing windows or many concurrent users.")
 P(f"**Q2 – Data quality without look-ahead.** The raw data contain year-to-date flows, zeros that mean ‘not reported’, "

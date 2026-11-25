@@ -1,0 +1,45 @@
+machine: 8 logical cores, 15.6 GB RAM
+  x1 polars 4 threads: total     1.8s (session   0.0s, compute     1.8s) peak    1180 MB
+  x1 polars 4 threads: total     1.5s (session   0.0s, compute     1.5s) peak    1410 MB
+  x1 polars 4 threads: total     1.4s (session   0.0s, compute     1.4s) peak    1392 MB
+  x1 polars 8 threads: total     1.1s (session   0.0s, compute     1.1s) peak    1459 MB
+  x1 polars 8 threads: total     1.1s (session   0.0s, compute     1.1s) peak    1365 MB
+  x1 polars 8 threads: total     1.1s (session   0.0s, compute     1.1s) peak    1326 MB
+  x1 spark  4 threads: total   104.7s (session  20.3s, compute    84.4s) peak    2084 MB
+  x1 spark  4 threads: total   100.2s (session  10.8s, compute    89.4s) peak    1995 MB
+  x1 spark  4 threads: total    99.4s (session  12.2s, compute    87.2s) peak    2019 MB
+  x1 spark  8 threads: total    79.5s (session  10.8s, compute    68.7s) peak    2151 MB
+Traceback (most recent call last):
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\src\10_spark_benchmark.py", line 166, in <module>
+    main()
+    ~~~~^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\src\10_spark_benchmark.py", line 138, in main
+    r = launch(engine, th, scale)
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\src\10_spark_benchmark.py", line 107, in launch
+    raise RuntimeError(p.stderr[-2000:])
+RuntimeError: threads, SCALES[a.scale]) if a.child == "spark" else child_polars(SCALES[a.scale])
+          ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\src\10_spark_benchmark.py", line 78, in child_spark
+    row = out.agg(F.count("*").alias("rows"), *[F.sum(c).alias(c) for c in OUT_SUM]).collect()[0].asDict()
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\pyspark\sql\classic\dataframe.py", line 503, in collect
+    with SCCallSiteSync(self._sc):
+         ~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\pyspark\traceback_utils.py", line 80, in __exit__
+    self._context._jsc.setCallSite(None)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\py4j\java_gateway.py", line 1361, in __call__
+    answer = self.gateway_client.send_command(command)
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\py4j\java_gateway.py", line 1036, in send_command
+    connection = self._get_connection()
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\py4j\clientserver.py", line 284, in _get_connection
+    connection = self._create_new_connection()
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\py4j\clientserver.py", line 291, in _create_new_connection
+    connection.connect_to_java_server()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\ASUS\Desktop\Môn Bigdata\Final exam\.venv\Lib\site-packages\py4j\clientserver.py", line 438, in connect_to_java_server
+    self.socket.connect((self.java_address, self.java_port))
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+ERROR: The process "21668" not found.
+

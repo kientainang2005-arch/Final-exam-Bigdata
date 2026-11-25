@@ -1,0 +1,5 @@
+config,scale,engine,threads,runs,session_s,compute_s,total_s,total_s_min,total_s_max,peak_tree_mb,logs
+polars 4 threads,1,polars,4,6,0.000,1.500,1.500,1.400,1.800,1430.000,session1_ended_by_jvm_crash.log + session2_ended_by_system_crash.log
+polars 8 threads,1,polars,8,6,0.000,1.050,1.050,0.900,1.100,1459.000,session1_ended_by_jvm_crash.log + session2_ended_by_system_crash.log
+spark local[4],1,spark,4,5,11.300,87.200,100.200,92.500,104.700,2136.000,session1_ended_by_jvm_crash.log + session2_ended_by_system_crash.log
+spark local[8],1,spark,8,1,10.800,68.700,79.500,79.500,79.500,2151.000,session1_ended_by_jvm_crash.log
