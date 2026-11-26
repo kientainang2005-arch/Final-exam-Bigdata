@@ -542,7 +542,7 @@ P(f"**Equal threads and repeated runs (Table {tn('spark_bench')}).** The noteboo
   f"(Python + JVM), sampled every 0.2 s. The script was written for the ×1, ×2 and ×4 data, but on this laptop no "
   f"valid session got past ×1. Two earlier sessions that reached ×2 and ×4 were discarded for timing, because the "
   f"laptop slept during one and ran throttled on battery in the other; their checks still show that Spark's column "
-  f"sums equal Polars' to within 8.4e-14 at every size (logs in logs/spark_benchmark/discarded/). Of the two "
+  f"sums equal Polars' to a maximum relative difference of 8.4e-14 at every size (logs in logs/spark_benchmark/discarded/). Of the two "
   f"sessions run on mains power with sleep blocked, the first ended when the emulated x64 JVM crashed with an "
   f"access violation in its garbage collector (logs/spark_benchmark/jvm_crash_session1_excerpt.txt) and the second "
   f"when Windows itself crashed. Table {tn('spark_bench')} reports all completed ×1 runs of these two sessions, "
@@ -550,7 +550,7 @@ P(f"**Equal threads and repeated runs (Table {tn('spark_bench')}).** The noteboo
   f"version of the script without the automatic repeat of crashed runs (same measurement code). At equal threads "
   f"Spark's computation alone takes {eq_r4:.0f} times (4 threads) and {eq_r8:.0f} times (8 threads) as long as the "
   f"whole Polars job, plus a median {_s4.session_s:.0f} s of JVM start-up per job; its process tree peaks at "
-  f"{f0(_s4.peak_tree_mb)} MB against {f0(_p4.peak_tree_mb)}–{f0(pl_m)} MB for Polars (Tables {tn('spark_bench')} and "
+  f"{f0(min(_s4.peak_tree_mb, _s8.peak_tree_mb))}–{f0(max(_s4.peak_tree_mb, _s8.peak_tree_mb))} MB against {f0(_p4.peak_tree_mb)}–{f0(pl_m)} MB for Polars (Tables {tn('spark_bench')} and "
   f"{tn('bench')}; a one-second Polars job is sampled only a few times, so Table {tn('bench')}'s exact peak is the "
   f"safer comparison). The JVM crash is a further practical point for Section 4.4: on one modest machine the JVM "
   f"stack was not only slower but also less robust (the Windows crash happened while Spark was running, but its "
@@ -567,7 +567,7 @@ T("spark_bench", _sb, "Spark vs. Polars at equal thread counts on the real panel
   "is the maximum over runs of the process tree).",
   widths=[4.2, 1.7, 2.0, 2.0, 2.0, 2.2, 2.0], size=8)
 H("4.4 When would a cluster be justified?", 2)
-P(f"The full 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {f0(pl_m)} MB in memory for "
+P(f"The curated Financials layer behind the 42-year panel occupies {st_part.size_MB:.0f} MB on disk and at most {f0(pl_m)} MB in memory for "
   f"the benchmarked core pipeline (Table {tn('bench')}), which takes {pl_t:.1f} s; building the full 40-feature table and writing it "
   f"takes {feats['seconds']:.0f} s. From the scaling experiment the lazy engine needs roughly "
   f"{x8l_mem * 2**20 / x8_rows:,.0f} bytes per output row, so with 70% of 16 GB usable a single laptop can process about "
@@ -669,9 +669,10 @@ P(f"The baseline is the classic supervisory logit on five CAMELS ratios (equity/
   f"walk-forward PR-AUC (learning rate {hgbp['learning_rate']}, {hgbp['max_leaf_nodes']} leaves, at least "
   f"{hgbp['min_samples_leaf']} rows per leaf, {hgbp['max_iter']} trees). HGB is clearly best on every development metric (Figure 3) "
   f"and was selected; the model, features and threshold were frozen to results/frozen_choices.json before any "
-  f"test-period prediction was made (per-fold results for all models: Table {tn('cva')}). No choice was revisited after the test evaluation; the end-to-end reproducibility run "
-  f"(run_all.py, log in logs/run_all.log) recomputes the same frozen choices and the identical test metrics "
-  f"deterministically.")
+  f"test-period prediction was made (per-fold results for all models: Table {tn('cva')}). No choice was revisited after the test evaluation. The pipeline was then run end to end once more to check "
+  f"reproducibility (run_all.py, log in logs/run_all.log); being deterministic, it reproduced the same frozen "
+  f"choices and test metrics, so the test period was scored twice with identical results. Only the outputs of "
+  f"that second run are committed.")
 FIGURE(FIG / "model_pr_and_cost.png", "Left: pooled out-of-fold PR curves on the development period (AP of the pooled "
        f"predictions, therefore different from the per-fold means in Table {tn('cv')}). Right: expected cost vs. alarm threshold.", 16.5)
 H("6.3 Alarm threshold from costs", 2)
@@ -767,6 +768,9 @@ if mllib is not None:
 
 H("6.5 What the model learned (development period only)", 2)
 _top = imp.head(10)
+_rank = {f: i for i, f in enumerate(imp.feature)}
+assert [_rank[f] for f in ("eq_ta", "n_reports", "roa_4q", "texas", "ag_ln", "d4_eq_ta", "roa_vol8", "npa_ta")] == \
+    list(range(8)), "section 6.5 lists the top eight features in rank order; the ranking has changed"
 for _f in ("eq_ta", "n_reports", "roa_4q", "texas", "d4_eq_ta", "npa_ta"):
     assert _f in set(_top.feature), f"text below names {_f}, which is no longer in the top 10"
 P(f"Permutation importance of the selected HGB configuration was computed on each development walk-forward fold: the "
@@ -774,10 +778,10 @@ P(f"Permutation importance of the selected HGB configuration was computed on eac
   f"measured (3 repeats; src/08_feature_importance.py). The test period is not used. Figure 5 shows the twelve most important features and Table {tn('importance')} lists the "
   f"ten most important features with the direction of their medians in failing versus other development "
   f"bank-quarters. The leading signals follow the CAMELS logic (FDIC, 1997): thin capital (eq_ta) ranks first, "
-  f"and – apart from n_reports, discussed below – the next signals are weak earnings (roa_4q, the trailing four-quarter "
-  f"mean ROA), bad assets relative to loss-absorbing capital (texas) and to total assets (npa_ta), less agricultural "
-  f"lending (ag_ln, lower in failing banks) and "
-  f"eroding capital (d4_eq_ta). Two caveats apply. Importance varies strongly across folds (the standard deviations "
+  f"and – apart from n_reports, discussed below – the next signals in rank order are weak earnings (roa_4q, the "
+  f"trailing four-quarter mean ROA), bad assets relative to loss-absorbing capital (texas), less agricultural lending "
+  f"(ag_ln, lower in failing banks), eroding capital (d4_eq_ta), volatile earnings (roa_vol8) and non-performing "
+  f"assets relative to total assets (npa_ta). Two caveats apply. Importance varies strongly across folds (the standard deviations "
   f"are of the same order as the means), so the ranking beyond the first few features is not stable. And the "
   f"second-ranked feature, n_reports, counts the quarters a bank has reported since 1984Q1: it captures bank age – "
   f"young banks fail more often – but, because reporting starts in 1984, it is truncated for older banks and partly "
@@ -795,7 +799,7 @@ FIGURE(FIG / "feature_importance_dev.png", "Permutation importance of the twelve
 H("7. Conclusions (Part 6)")
 P(f"**Q1 – Storage and processing.** Store the reports as a typed, zstd-compressed Parquet layer partitioned by year "
   f"({st_part.size_MB:.0f} MB instead of {st_csv.size_MB:.0f} MB of CSV, {st_csv.filter_2008_2010_s / st_part.filter_2008_2010_s:.0f}× "
-  f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {pl_m / 1024:.1f} GB for the core "
+  f"faster time-sliced reads) and process it with Polars' lazy engine ({pl_t:.1f} s and {f0(pl_m)} MB for the core "
   f"pipeline, {pd_t / pl_t:.1f}× faster than pandas). Spark gives identical results but, at equal "
   f"threads, its computation takes {eq_lo:.0f}–{eq_hi:.0f} times as long on one machine, and its emulated JVM crashed "
   f"during benchmarking; a cluster becomes "
@@ -851,7 +855,8 @@ B(["**Scale and tools:** about 50 banks reporting to the State Bank of Vietnam (
 H("References")
 B(["Cole, R. A. & White, L. J. (2012). Déjà Vu All Over Again: The Causes of U.S. Commercial Bank Failures This Time "
    "Around. Journal of Financial Services Research, 42(1), 5–29. https://doi.org/10.1007/s10693-011-0116-9",
-   "FDIC (1997). Uniform Financial Institutions Rating System, policy statement. Federal Register, 62(3), 752–757, "
+   "FDIC (1997). Uniform Financial Institutions Rating System, policy statement adopting the FFIEC rating system. "
+   "Federal Register, 62(3), 752–757, "
    "6 January 1997 (FR Doc. 97-155).",
    "FDIC (1998). Managing the Crisis: The FDIC and RTC Experience, 1980–1994. Federal Deposit Insurance Corporation. "
    "https://www.fdic.gov/resources/publications/managing-the-crisis",
@@ -932,5 +937,12 @@ P("python -m venv .venv; pip install -r requirements.txt; python run_all.py. The
   "python report/build_report.py. Full instructions: README.md.")
 
 OUT.parent.mkdir(exist_ok=True)
+# document properties (shown in File > Properties of the DOCX and the exported PDF)
+cp = doc.core_properties
+cp.author = cp.last_modified_by = f"{AUTHOR} ({SID})"
+cp.title = "A Big-Data Pipeline for Bank-Failure Early Warning"
+cp.subject = "BFT65B – Big Data Analytics in Finance, final individual report"
+cp.comments = ""
+cp.keywords = "FDIC, Polars, PySpark, early warning, data pipeline"
 doc.save(OUT)
 print("written", OUT)

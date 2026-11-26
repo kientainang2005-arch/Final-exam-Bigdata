@@ -178,7 +178,7 @@ Code 211 is the usual 'failure' code, but only 83.6% of failed banks carry it (o
 ## 10. Point-in-time traps
 * 4,518 of 24,064 banks (18.8%) changed charter class (BKCLASS) and 249 changed state over time. The Institutions table stores only the **latest** value, so joining it to old quarters would leak today's information into the past.
 * Institutions fields ACTIVE, ENDEFYMD, CHANGEC*, INACTIVE describe the bank's *end* of life: using them as features is direct look-ahead. The pipeline uses Institutions only to *classify exits for the label*.
-* The API serves the latest revised (amended) value of each Call Report, not the vintage first published ~30-45 days after quarter end. Restatements cannot be detected from this source (limitation).
+* The API serves the latest revised (amended) value of each Call Report, not the vintage first published ~30-60 days after quarter end. Restatements cannot be detected from this source (limitation).
 
 ## 11. Type drift in the raw files
 * 20 columns change physical type between raw quarter files (e.g. int64 in one quarter, double when a null appears). The curated layer enforces one schema (amounts Int64, ratios Float64, REPDTE Date).

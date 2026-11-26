@@ -302,7 +302,7 @@ def check_pit() -> None:
     p("* Institutions fields ACTIVE, ENDEFYMD, CHANGEC*, INACTIVE describe the bank's *end* of life: using them as "
       "features is direct look-ahead. The pipeline uses Institutions only to *classify exits for the label*.")
     p("* The API serves the latest revised (amended) value of each Call Report, not the vintage first published "
-      "~30-45 days after quarter end. Restatements cannot be detected from this source (limitation).")
+      "~30-60 days after quarter end. Restatements cannot be detected from this source (limitation).")
     issue("Static attributes", "Institutions holds current, not historical, BKCLASS/STNAME/SPECGRP",
           f"{int((ch['k'] > 1).sum())} banks", "use quarter-specific BKCLASS/STNAME from Financials")
     issue("Exit fields", "ACTIVE/ENDEFYMD/CHANGEC are future information", "all", "never used as features")

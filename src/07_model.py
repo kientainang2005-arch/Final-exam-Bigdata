@@ -161,7 +161,7 @@ def cost_parameters(dev: pd.DataFrame) -> dict:
     median_cost = f.COST.median()                              # $ thousands per failure
     # False alarm = an extra targeted on-site examination of a healthy bank. Its cost is not in the FDIC
     # data; we anchor it to the median development-period bank: c_exam x assets, c_exam = 0.1% of assets
-    # (examination + management time), capped below by $50k. Sensitivity is reported for 0.5x..4x.
+    # (examination + management time), capped below by $50k. Sensitivity is reported for 0.25x..4x.
     early_avoidable = 0.25                                     # share of loss avoidable by early action
     c_fn = early_avoidable * median_cost
     c_fp = max(50.0, 0.001 * dev.ASSET.median())

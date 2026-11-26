@@ -98,7 +98,7 @@ without the automatic repeat of crashed runs; the measurement code was the same.
 * Cole, R. A. & White, L. J. (2012). Déjà Vu All Over Again: The Causes of U.S. Commercial Bank Failures This Time
   Around. *Journal of Financial Services Research*, 42(1), 5–29. https://doi.org/10.1007/s10693-011-0116-9 –
   CAMELS proxies and commercial real-estate exposure explain the 2009 failures (field and feature choice).
-* FDIC (1997). Uniform Financial Institutions Rating System. *Federal Register*, 62(3), 752–757 – definition of the
+* FDIC (1997). Uniform Financial Institutions Rating System (policy statement adopting the FFIEC system). *Federal Register*, 62(3), 752–757 – definition of the
   six CAMELS components used to organise the features.
 * FDIC (1998). *Managing the Crisis: The FDIC and RTC Experience, 1980–1994*.
   https://www.fdic.gov/resources/publications/managing-the-crisis – the 1980s–1990s crisis and the resolution
